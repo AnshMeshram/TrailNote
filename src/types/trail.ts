@@ -137,6 +137,8 @@ export interface FieldJournalEntry {
   weatherExperienced: string;
   notableFloraFauna?: string[];
   photoUrls?: string[];
+  photoId?: string;
+  photoAlt?: string;
   sight?: string;
   sound?: string;
   texture?: string;

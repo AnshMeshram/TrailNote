@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { Navigation } from '@/components/layout/Navigation';
 import { Footer } from '@/components/layout/Footer';
+import { PwaRegistrar } from '@/components/layout/PwaRegistrar';
 
 export const metadata: Metadata = {
   title: 'Trailnote — Plan the walk. Make the note. Put the phone away.',
@@ -50,6 +51,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#3A6704" />
       </head>
       <body>
+        <PwaRegistrar />
         <Navigation />
         <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {children}

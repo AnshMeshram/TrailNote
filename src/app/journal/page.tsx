@@ -2,22 +2,101 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Calendar, MapPin, Feather, Compass, ArrowRight, Trash2 } from 'lucide-react';
+import {
+  MapPin,
+  Feather,
+  Compass,
+  Trash2,
+  Download,
+  FileJson,
+  FileText,
+  Check,
+  X,
+  Sparkles,
+} from 'lucide-react';
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { listJournalEntries, saveJournalEntry } from '@/lib/storage/offline-store';
 import { FieldJournalEntry } from '@/types/trail';
+import { getPhotoDataUrl } from '@/lib/storage/photo-db';
+
+function JournalPhoto({
+  photoId,
+  fallbackUrl,
+  altText,
+}: {
+  photoId?: string;
+  fallbackUrl?: string;
+  altText?: string;
+}) {
+  const [dataUrl, setDataUrl] = useState<string | null>(fallbackUrl || null);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (photoId) {
+      getPhotoDataUrl(photoId)
+        .then((url) => {
+          if (isMounted && url) {
+            setDataUrl(url);
+          }
+        })
+        .catch(() => {});
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [photoId]);
+
+  if (!dataUrl) return null;
+
+  return (
+    <div style={{ marginBottom: '1.25rem' }}>
+      <div
+        style={{
+          maxWidth: '320px',
+          padding: '6px 6px 12px 6px',
+          backgroundColor: '#FAF7F0',
+          border: '1px solid var(--paper-border-dark)',
+          borderRadius: '2px',
+          boxShadow: 'var(--shadow-tactile)',
+        }}
+      >
+        <img
+          src={dataUrl}
+          alt={altText || 'Local trail field specimen photograph'}
+          style={{ width: '100%', height: '180px', objectFit: 'cover', borderRadius: '1px' }}
+        />
+        <div
+          className="field-label"
+          style={{
+            fontSize: '0.62rem',
+            textAlign: 'center',
+            marginTop: '6px',
+            color: 'var(--ink-muted)',
+          }}
+        >
+          {altText || 'FIELD SPECIMEN // LOCAL ATTACHMENT'}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function JournalPage() {
   const [entries, setEntries] = useState<FieldJournalEntry[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [shapingId, setShapingId] = useState<string | null>(null);
+  const [pendingProposal, setPendingProposal] = useState<{
+    entryId: string;
+    shapedNote: string;
+    source: 'gemma2' | 'naturalist-fallback';
+  } | null>(null);
 
   useEffect(() => {
     const saved = listJournalEntries();
     if (saved && saved.length > 0) {
       setEntries(saved);
     } else {
-      // Seed default canonical walks if user hasn't recorded yet
+      // Seed default canonical walk if user hasn't recorded yet
       const seedWalks: FieldJournalEntry[] = [
         {
           id: 'log-01',
@@ -43,28 +122,17 @@ export default function JournalPage() {
             'Under the quiet canopy of Seminary Hills, the morning unfolded in slow cadence. Teak leaves blanketed the earth in brittle rust, releasing a dry autumn fragrance at every step. In the silence between breaths, a purple sunbird called from the basalt ridge, anchoring the ascent in the tactile terrain of rock and tree. With devices left in airplane mode, the living landscape stepped forward into focus.',
           shapedSource: 'naturalist-fallback',
         },
-        {
-          id: 'log-02',
-          trailId: 'trail-02',
-          date: 'October 1, 2026',
-          trailName: 'Ambazari Lake Forest Path',
-          location: 'Nagpur, Maharashtra',
-          distanceCoveredKm: 3.2,
-          timeSpentMinutes: 52,
-          observationsRecorded: [
-            'Morning mist resting over the water surface.',
-            'Pied kingfisher spotted perched on dry bamboo reed.',
-          ],
-          personalReflection:
-            'Walked before sunrise. The stillness of the water felt restorative. Noticed the smell of damp soil and dried grass.',
-          weatherExperienced: '21°C Morning Mist',
-          notableFloraFauna: ['Pied kingfisher', 'Damp earth fragrance'],
-        },
       ];
       setEntries(seedWalks);
     }
     setIsLoaded(true);
   }, []);
+
+  // Gentle outdoor-days count (5.4: no streaks, no gamification badges, no notifications)
+  const currentMonthName = new Date().toLocaleDateString('en-US', { month: 'long' });
+  const walksThisMonth = entries.filter((e) =>
+    e.date.toLowerCase().includes(currentMonthName.toLowerCase())
+  ).length;
 
   const handleShapeNote = async (entry: FieldJournalEntry) => {
     setShapingId(entry.id);
@@ -86,20 +154,12 @@ export default function JournalPage() {
       if (res.ok) {
         const data = await res.json();
         if (data.success && data.shapedNote) {
-          const updated = entries.map((e) =>
-            e.id === entry.id
-              ? {
-                  ...e,
-                  shapedNote: data.shapedNote,
-                  shapedSource: (data.source === 'gemma2' ? 'gemma2' : 'naturalist-fallback') as 'gemma2' | 'naturalist-fallback',
-                }
-              : e
-          );
-          setEntries(updated);
-          const target = updated.find((e) => e.id === entry.id);
-          if (target) {
-            saveJournalEntry(target);
-          }
+          // Present proposal to user: original stays visible, user accepts or rejects
+          setPendingProposal({
+            entryId: entry.id,
+            shapedNote: data.shapedNote,
+            source: (data.source === 'gemma2' ? 'gemma2' : 'naturalist-fallback'),
+          });
         }
       }
     } catch (err) {
@@ -107,6 +167,29 @@ export default function JournalPage() {
     } finally {
       setShapingId(null);
     }
+  };
+
+  const handleAcceptProposal = (entryId: string) => {
+    if (!pendingProposal || pendingProposal.entryId !== entryId) return;
+    const updated = entries.map((e) =>
+      e.id === entryId
+        ? {
+            ...e,
+            shapedNote: pendingProposal.shapedNote,
+            shapedSource: pendingProposal.source,
+          }
+        : e
+    );
+    setEntries(updated);
+    const target = updated.find((e) => e.id === entryId);
+    if (target) {
+      saveJournalEntry(target);
+    }
+    setPendingProposal(null);
+  };
+
+  const handleRejectProposal = () => {
+    setPendingProposal(null);
   };
 
   const handleDelete = (id: string) => {
@@ -119,8 +202,83 @@ export default function JournalPage() {
     }
   };
 
+  const handleClearAll = () => {
+    if (
+      confirm('Clear all offline journal entries from this device? This action cannot be undone.') &&
+      confirm('Are you completely sure? All local walk notes will be cleared.')
+    ) {
+      setEntries([]);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('trailnote_journal_entries', JSON.stringify([]));
+      }
+    }
+  };
+
+  const handleExportMarkdown = () => {
+    const md = `# Trailnote Field Journal
+Exported: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+Total Expeditions: ${entries.length}
+
+${entries
+  .map(
+    (e) => `## ${e.trailName}
+- **Date:** ${e.date}
+- **Location:** ${e.location}
+- **Distance:** ${e.distanceCoveredKm} km
+- **Duration:** ${e.timeSpentMinutes} min
+- **Weather:** ${e.weatherExperienced}
+
+### Original Observation Note
+> ${e.personalReflection}
+
+${
+  e.shapedNote
+    ? `### Field Note // Naturalist Prose (${e.shapedSource === 'gemma2' ? 'Gemma 2' : 'Built-in Rules'})
+> ${e.shapedNote}
+`
+    : ''
+}
+${
+  e.sight || e.sound || e.texture
+    ? `### Sensory Observations
+${e.sight ? `- **Sight:** ${e.sight}\n` : ''}${e.sound ? `- **Sound:** ${e.sound}\n` : ''}${
+        e.texture ? `- **Texture:** ${e.texture}\n` : ''
+      }`
+    : ''
+}
+${
+  e.observationsRecorded && e.observationsRecorded.length > 0
+    ? `### Observations Recorded\n${e.observationsRecorded.map((obs) => `- ${obs}`).join('\n')}\n`
+    : ''
+}
+---
+`
+  )
+  .join('\n')}`;
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trailnote-journal-${new Date().toISOString().split('T')[0]}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportJson = () => {
+    const jsonStr = JSON.stringify(entries, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `trailnote-journal-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="container" style={{ paddingTop: '2.5rem', paddingBottom: '5rem', maxWidth: '840px' }}>
+    <div className="container" style={{ paddingTop: '2.5rem', paddingBottom: '5rem', maxWidth: '860px' }}>
+      {/* Top Header */}
       <div
         style={{
           borderBottom: '2px solid var(--paper-border-dark)',
@@ -140,21 +298,66 @@ export default function JournalPage() {
               FIELD JOURNAL // PERSONAL EXPEDITIONS
             </span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.6rem', margin: '0 0 0.5rem 0' }}>
+          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2.6rem', margin: '0 0 0.35rem 0' }}>
             Outdoor Journal
           </h1>
           <p style={{ margin: 0, color: 'var(--ink-soft)' }}>
             A quiet record of the dirt you've walked, the air you've breathed, and what you noticed along the way.
           </p>
+
+          {/* Gentle Outdoor-Days Count (5.4: no streaks, no gamification badges, no notifications) */}
+          <div style={{ marginTop: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span
+              className="field-stamp green"
+              style={{ fontSize: '0.82rem', padding: '0.35rem 0.65rem' }}
+            >
+              🍃 {walksThisMonth} {walksThisMonth === 1 ? 'walk' : 'walks'} this month
+            </span>
+            <span style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)' }}>
+              {entries.length} total walks outside · stored on this device
+            </span>
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <Link href="/field-test" className="btn-secondary" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }}>
-            <span>Field Test Protocol</span>
+        {/* Action Controls */}
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={handleExportMarkdown}
+            className="btn-secondary"
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+            title="Export all journal entries to Markdown file"
+          >
+            <FileText size={14} />
+            <span>Export (.md)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportJson}
+            className="btn-secondary"
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+            title="Export raw data to JSON file"
+          >
+            <FileJson size={14} />
+            <span>Export (.json)</span>
+          </button>
+
+          <Link
+            href="/field-test"
+            className="btn-secondary"
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+          >
+            <span>Field Test Log</span>
           </Link>
-          <Link href="/plan" className="btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+
+          <Link
+            href="/plan"
+            className="btn-primary"
+            style={{ padding: '0.55rem 1.15rem', fontSize: '0.85rem', minHeight: '48px' }}
+          >
             <Compass size={15} />
-            <span>Plan New Walk</span>
+            <span>Plan Walk</span>
           </Link>
         </div>
       </div>
@@ -179,7 +382,7 @@ export default function JournalPage() {
           <p style={{ color: 'var(--ink-soft)', marginBottom: '1.75rem', maxWidth: '420px', margin: '0 auto 1.75rem auto' }}>
             Your first field note is waiting outside. Step through the front door, let your senses awaken, and return to jot down what you observed.
           </p>
-          <Link href="/plan" className="btn-primary">
+          <Link href="/plan" className="btn-primary" style={{ minHeight: '48px' }}>
             <Compass size={16} />
             <span>Plan Your First Walk</span>
           </Link>
@@ -191,6 +394,7 @@ export default function JournalPage() {
             const mins = walk.timeSpentMinutes % 60;
             const durationStr = hours > 0 ? `${hours}h ${mins > 0 ? `${mins}m` : ''}` : `${mins}m`;
             const isShapingThis = shapingId === walk.id;
+            const hasPendingProposal = pendingProposal?.entryId === walk.id;
 
             return (
               <article
@@ -238,47 +442,77 @@ export default function JournalPage() {
                   </div>
                 </div>
 
-                {/* Attached Local Photo Thumbnail if present */}
-                {walk.photoUrls && walk.photoUrls[0] && (
-                  <div style={{ marginBottom: '1.25rem' }}>
-                    <div
-                      style={{
-                        maxWidth: '260px',
-                        padding: '6px 6px 12px 6px',
-                        backgroundColor: '#FAF7F0',
-                        border: '1px solid var(--paper-border-dark)',
-                        borderRadius: '2px',
-                        boxShadow: 'var(--shadow-tactile)',
-                      }}
-                    >
-                      <img
-                        src={walk.photoUrls[0]}
-                        alt="Local trail photo"
-                        style={{ width: '100%', height: '160px', objectFit: 'cover', borderRadius: '1px' }}
-                      />
-                      <div className="field-label" style={{ fontSize: '0.62rem', textAlign: 'center', marginTop: '6px', color: 'var(--ink-muted)' }}>
-                        LOCAL TRAIL SNAPSHOT // SPECIMEN
-                      </div>
-                    </div>
-                  </div>
-                )}
+                {/* Local Photo Attachment (IndexedDB or URL) */}
+                <JournalPhoto
+                  photoId={walk.photoId}
+                  fallbackUrl={walk.photoUrls?.[0]}
+                  altText={walk.photoAlt}
+                />
 
-                {/* ORIGINAL NOTE SECTION */}
+                {/* ORIGINAL NOTE (ALWAYS REMAINS VISIBLE) */}
                 <div style={{ marginBottom: '1.25rem' }}>
                   <div className="field-label" style={{ marginBottom: '0.35rem', color: 'var(--ink-muted)' }}>
-                    ORIGINAL NOTE
+                    ORIGINAL FIELD JOTTING
                   </div>
                   <p style={{ fontSize: '0.96rem', color: 'var(--ink-primary)', lineHeight: 1.6, fontStyle: 'italic', margin: 0 }}>
                     "{walk.personalReflection}"
                   </p>
                 </div>
 
-                {/* AI FIELD NOTE SECTION (If shaped) */}
-                {walk.shapedNote ? (
+                {/* PENDING SHAPED PROPOSAL (Phase 9: User accepts or rejects; original always visible) */}
+                {hasPendingProposal && (
                   <div
                     style={{
                       padding: '1.25rem',
                       backgroundColor: 'rgba(58, 103, 4, 0.08)',
+                      border: '2px solid var(--green-leaf)',
+                      borderRadius: '3px',
+                      marginBottom: '1.25rem',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <span className="field-label" style={{ color: 'var(--green-deep)', fontWeight: 700 }}>
+                        PROPOSED PROSE // {pendingProposal.source === 'gemma2' ? 'GEMMA 2 ACTIVE' : 'BUILT-IN FIELD RULES'}
+                      </span>
+                      <span className="field-stamp green" style={{ fontSize: '0.65rem' }}>
+                        AWAITING YOUR APPROVAL
+                      </span>
+                    </div>
+
+                    <p style={{ margin: '0 0 1rem 0', fontSize: '0.98rem', color: 'var(--green-deep)', lineHeight: 1.65, fontStyle: 'italic', fontFamily: 'var(--font-serif)' }}>
+                      "{pendingProposal.shapedNote}"
+                    </p>
+
+                    <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleAcceptProposal(walk.id)}
+                        className="btn-primary"
+                        style={{ padding: '0.45rem 0.95rem', fontSize: '0.8rem', minHeight: '44px' }}
+                      >
+                        <Check size={14} />
+                        <span>Accept Shaped Prose</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleRejectProposal}
+                        className="btn-secondary"
+                        style={{ padding: '0.45rem 0.95rem', fontSize: '0.8rem', minHeight: '44px' }}
+                      >
+                        <X size={14} />
+                        <span>Keep Original Only</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* SAVED AI FIELD NOTE SECTION (If previously accepted) */}
+                {!hasPendingProposal && walk.shapedNote && (
+                  <div
+                    style={{
+                      padding: '1.25rem',
+                      backgroundColor: 'rgba(58, 103, 4, 0.06)',
                       borderLeft: '3px solid var(--green-leaf)',
                       borderRadius: '2px',
                       marginBottom: '1.25rem',
@@ -286,17 +520,17 @@ export default function JournalPage() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <span className="field-label" style={{ color: 'var(--green-deep)' }}>
-                        FIELD NOTE // NATURALIST PROSE ({walk.shapedSource === 'gemma2' ? 'GEMMA 2' : 'BUILT-IN RULES'})
+                        ACCEPTED FIELD PROSE // {walk.shapedSource === 'gemma2' ? 'GEMMA 2' : 'BUILT-IN RULES'}
                       </span>
                       <span className="field-stamp green" style={{ fontSize: '0.65rem' }}>
-                        REFINED
+                        PRESERVED
                       </span>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.96rem', color: 'var(--green-deep)', lineHeight: 1.65, fontStyle: 'italic', fontFamily: 'var(--font-serif)' }}>
                       "{walk.shapedNote}"
                     </p>
                   </div>
-                ) : null}
+                )}
 
                 {/* Sensory Sights / Sounds / Textures */}
                 {(walk.sight || walk.sound || walk.texture) && (
@@ -366,10 +600,10 @@ export default function JournalPage() {
                       onClick={() => handleShapeNote(walk)}
                       disabled={isShapingThis}
                       className="btn-secondary"
-                      style={{ padding: '0.4rem 0.85rem', fontSize: '0.78rem' }}
+                      style={{ padding: '0.45rem 0.85rem', fontSize: '0.78rem', minHeight: '44px' }}
                     >
                       <Feather size={13} color="#3A6704" />
-                      <span>{isShapingThis ? 'Shaping with Gemma...' : walk.shapedNote ? 'Reshape Note' : 'Shape This Note'}</span>
+                      <span>{isShapingThis ? 'Shaping with Gemma...' : walk.shapedNote ? 'Propose New Prose' : 'Shape This Note'}</span>
                     </button>
 
                     {walk.notableFloraFauna && walk.notableFloraFauna.length > 0 && (
@@ -389,18 +623,41 @@ export default function JournalPage() {
                       border: 'none',
                       color: 'var(--ink-muted)',
                       cursor: 'pointer',
-                      padding: '0.3rem',
+                      padding: '0.5rem',
                       display: 'flex',
                       alignItems: 'center',
+                      minHeight: '44px',
+                      minWidth: '44px',
+                      justifyContent: 'center',
                     }}
                     title="Remove entry"
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={15} />
                   </button>
                 </div>
               </article>
             );
           })}
+
+          {/* Clear Journal Action */}
+          <div style={{ textAlign: 'right', paddingTop: '1rem' }}>
+            <button
+              type="button"
+              onClick={handleClearAll}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--terracotta)',
+                fontSize: '0.78rem',
+                fontFamily: 'var(--font-mono)',
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                minHeight: '44px',
+              }}
+            >
+              [ Clear All Journal Entries ]
+            </button>
+          </div>
         </div>
       )}
     </div>

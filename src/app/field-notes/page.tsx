@@ -6,6 +6,7 @@ import { Feather, Check, ArrowRight, Sparkles, MapPin, Camera, X, Image as Image
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { getActiveTrail, saveJournalEntry } from '@/lib/storage/offline-store';
 import { FieldJournalEntry } from '@/types/trail';
+import { compressPhotoFile, storePhotoBlob } from '@/lib/storage/photo-db';
 
 export default function FieldNotesPage() {
   const [trailName, setTrailName] = useState('Autumn Loop · Seminary Hills');
@@ -18,6 +19,9 @@ export default function FieldNotesPage() {
   const [observations, setObservations] = useState('');
   const [difficultyFeedback, setDifficultyFeedback] = useState('Just right / Accurate');
   const [photoDataUrl, setPhotoDataUrl] = useState<string | null>(null);
+  const [photoId, setPhotoId] = useState<string | null>(null);
+  const [photoAlt, setPhotoAlt] = useState<string>('');
+  const [photoStatusMessage, setPhotoStatusMessage] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -30,27 +34,32 @@ export default function FieldNotesPage() {
     }
   }, []);
 
-  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Check size limit: max 4MB for local storage safety
-    if (file.size > 4 * 1024 * 1024) {
-      alert('Please select an image smaller than 4MB for local offline notebook storage.');
-      return;
-    }
+    setPhotoStatusMessage('Compressing photo client-side (max ~1280px)...');
+    try {
+      // Compress client-side to maximum 1280px width/height and JPEG quality 0.82
+      const { blob, dataUrl } = await compressPhotoFile(file, 1280, 0.82);
+      setPhotoDataUrl(dataUrl);
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      if (typeof event.target?.result === 'string') {
-        setPhotoDataUrl(event.target.result);
-      }
-    };
-    reader.readAsDataURL(file);
+      // Store pure blob directly into native IndexedDB
+      setPhotoStatusMessage('Saving photo into local IndexedDB...');
+      const storedId = await storePhotoBlob(blob);
+      setPhotoId(storedId);
+      setPhotoStatusMessage(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Storage quota reached';
+      setPhotoStatusMessage(`Storage notice: ${msg}`);
+    }
   };
 
   const handleRemovePhoto = () => {
     setPhotoDataUrl(null);
+    setPhotoId(null);
+    setPhotoAlt('');
+    setPhotoStatusMessage(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -83,6 +92,8 @@ export default function FieldNotesPage() {
       weatherExperienced: 'Crisp autumn weather',
       notableFloraFauna: favoritePart ? [favoritePart] : undefined,
       photoUrls: photoDataUrl ? [photoDataUrl] : undefined,
+      photoId: photoId || undefined,
+      photoAlt: photoAlt.trim() || undefined,
       sight,
       sound,
       texture,
@@ -282,52 +293,67 @@ export default function FieldNotesPage() {
               </span>
             </div>
 
+            {photoStatusMessage && (
+              <div style={{ marginBottom: '0.75rem', fontSize: '0.78rem', color: 'var(--terracotta)', fontFamily: 'var(--font-mono)' }}>
+                {photoStatusMessage}
+              </div>
+            )}
+
             {photoDataUrl ? (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '120px',
-                    height: '90px',
-                    borderRadius: '3px',
-                    overflow: 'hidden',
-                    border: '2px solid var(--paper-border-dark)',
-                    boxShadow: 'var(--shadow-tactile)',
-                  }}
-                >
-                  <img
-                    src={photoDataUrl}
-                    alt="Trail attachment preview"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={handleRemovePhoto}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div
                     style={{
-                      position: 'absolute',
-                      top: '4px',
-                      right: '4px',
-                      backgroundColor: 'rgba(0,0,0,0.65)',
-                      color: '#FFF',
-                      border: 'none',
-                      borderRadius: '50%',
-                      width: '20px',
-                      height: '20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
+                      position: 'relative',
+                      width: '120px',
+                      height: '90px',
+                      borderRadius: '3px',
+                      overflow: 'hidden',
+                      border: '2px solid var(--paper-border-dark)',
+                      boxShadow: 'var(--shadow-tactile)',
                     }}
-                    title="Remove attached photo"
                   >
-                    <X size={12} />
-                  </button>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: 'var(--ink-soft)' }}>
-                  <strong>Field photo attached.</strong>
-                  <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.78rem', color: 'var(--ink-muted)' }}>
-                    Saved into your local offline field notebook.
-                  </p>
+                    <img
+                      src={photoDataUrl}
+                      alt={photoAlt || 'Trail attachment preview'}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleRemovePhoto}
+                      style={{
+                        position: 'absolute',
+                        top: '4px',
+                        right: '4px',
+                        backgroundColor: 'rgba(0,0,0,0.65)',
+                        color: '#FFF',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '20px',
+                        height: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                      }}
+                      title="Remove attached photo"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--ink-soft)' }}>
+                      <strong>Photo compressed &amp; stored locally in IndexedDB.</strong>
+                    </div>
+                    <input
+                      type="text"
+                      value={photoAlt}
+                      onChange={(e) => setPhotoAlt(e.target.value)}
+                      placeholder="Alt text: e.g. Teak leaf on basalt stone (optional)"
+                      className="field-input"
+                      style={{ width: '100%', marginTop: '0.35rem', padding: '0.4rem 0.6rem', fontSize: '0.8rem', minHeight: '40px' }}
+                    />
+                  </div>
                 </div>
               </div>
             ) : (
@@ -336,6 +362,7 @@ export default function FieldNotesPage() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*"
+                  capture="environment"
                   onChange={handlePhotoSelect}
                   style={{ display: 'none' }}
                   id="field-photo-input"
@@ -350,10 +377,11 @@ export default function FieldNotesPage() {
                     padding: '0.55rem 1rem',
                     fontSize: '0.82rem',
                     cursor: 'pointer',
+                    minHeight: '48px',
                   }}
                 >
-                  <ImageIcon size={15} color="#3A6704" />
-                  <span>Select Local Trail Photo</span>
+                  <Camera size={15} color="#3A6704" />
+                  <span>Attach Field Photo (Camera / File)</span>
                 </label>
               </div>
             )}
