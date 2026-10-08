@@ -1,0 +1,17 @@
+{
+  "name": "Trailnote",
+  "short_name": "Trailnote",
+  "description": "A local-first outdoor field notebook powered by Gemma 2.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F0E4",
+  "theme_color": "#3A6704",
+  "icons": [
+    {
+      "src": "/images/trailnote-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

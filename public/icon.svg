@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Rich tactile paper gradient -->
+    <linearGradient id="paperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FAF7F0" />
+      <stop offset="100%" stop-color="#EDE7D5" />
+    </linearGradient>
+
+    <!-- Deep spruce cover gradient -->
+    <linearGradient id="coverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D461E" />
+      <stop offset="100%" stop-color="#1A2D12" />
+    </linearGradient>
+
+    <!-- Autumn leaf gradient -->
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#558C16" />
+      <stop offset="50%" stop-color="#3A6704" />
+      <stop offset="100%" stop-color="#243A18" />
+    </linearGradient>
+
+    <!-- Warm autumn terracotta -->
+    <linearGradient id="rustGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#C25A32" />
+      <stop offset="100%" stop-color="#8F3C1C" />
+    </linearGradient>
+
+    <!-- Subtle drop shadow -->
+    <filter id="badgeShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#14200E" flood-opacity="0.35" />
+    </filter>
+
+    <filter id="paperShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#243A18" flood-opacity="0.18" />
+    </filter>
+  </defs>
+
+  <!-- Deep Spruce Notebook Badge Outer Frame -->
+  <rect x="16" y="16" width="480" height="480" rx="96" fill="url(#coverGrad)" filter="url(#badgeShadow)" />
+  
+  <!-- Outer Saddle-Stitch Border (Tactile Field Notebook) -->
+  <rect x="36" y="36" width="440" height="440" rx="76" fill="none" stroke="#FAF7F0" stroke-width="3" stroke-dasharray="14 10" opacity="0.35" />
+
+  <!-- Inner Warm Paper Plate -->
+  <rect x="64" y="64" width="384" height="384" rx="60" fill="url(#paperGrad)" filter="url(#paperShadow)" stroke="#DDD6C4" stroke-width="2" />
+
+  <!-- Ruled Notebook Margins / Topo Contours -->
+  <circle cx="256" cy="256" r="160" fill="none" stroke="#878118" stroke-width="1.5" stroke-dasharray="6 6" opacity="0.4" />
+  <circle cx="256" cy="256" r="132" fill="none" stroke="#243A18" stroke-width="1" opacity="0.2" />
+
+  <!-- Compass Cardinal Ticks -->
+  <!-- North -->
+  <line x1="256" y1="84" x2="256" y2="106" stroke="#243A18" stroke-width="4" stroke-linecap="round" />
+  <polygon points="256,76 251,88 261,88" fill="#A64B2A" />
+  <!-- South -->
+  <line x1="256" y1="406" x2="256" y2="428" stroke="#243A18" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+  <!-- West -->
+  <line x1="84" y1="256" x2="106" y2="256" stroke="#243A18" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+  <!-- East -->
+  <line x1="406" y1="256" x2="428" y2="256" stroke="#243A18" stroke-width="3" stroke-linecap="round" opacity="0.6" />
+
+  <!-- Curving Hiking Trail Contour Dash -->
+  <path d="M 120 330 Q 180 370 230 320 T 320 220 Q 380 170 410 190" fill="none" stroke="#A64B2A" stroke-width="3.5" stroke-dasharray="8 6" stroke-linecap="round" opacity="0.75" />
+
+  <!-- Waypoint Dot on Trail -->
+  <circle cx="205" cy="336" r="4.5" fill="#A64B2A" />
+  <circle cx="340" cy="204" r="4.5" fill="#A64B2A" />
+
+  <!-- Botanical Emblem: Curving Sugar Maple / Oak Leaf -->
+  <!-- Leaf Base Silhouette -->
+  <path d="M 256 124
+           C 278 162, 332 178, 328 214
+           C 324 236, 304 246, 316 268
+           C 326 288, 350 300, 334 324
+           C 318 348, 286 338, 276 356
+           C 268 370, 264 394, 256 404
+           C 248 394, 244 370, 236 356
+           C 226 338, 194 348, 178 324
+           C 162 300, 186 288, 196 268
+           C 208 246, 188 236, 184 214
+           C 180 178, 234 162, 256 124 Z"
+        fill="url(#leafGrad)"
+        stroke="#1A2D12"
+        stroke-width="5"
+        stroke-linejoin="round" />
+
+  <!-- Main Central Stem / Vein -->
+  <path d="M 256 142 L 256 398" stroke="#FAF7F0" stroke-width="5" stroke-linecap="round" opacity="0.95" />
+
+  <!-- Secondary Lateral Veins -->
+  <!-- Right Veins -->
+  <path d="M 256 200 Q 284 190 306 182" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 244 Q 286 242 304 248" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 292 Q 288 300 316 308" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 340 Q 272 350 286 354" fill="none" stroke="#FAF7F0" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+
+  <!-- Left Veins -->
+  <path d="M 256 200 Q 228 190 206 182" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 244 Q 226 242 208 248" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 292 Q 224 300 196 308" fill="none" stroke="#FAF7F0" stroke-width="3.5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 256 340 Q 240 350 226 354" fill="none" stroke="#FAF7F0" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+
+  <!-- Glowing Living Grass Accent (Theme: Touch Grass) -->
+  <circle cx="256" cy="124" r="8" fill="#A4D652" stroke="#243A18" stroke-width="2.5" />
+  <circle cx="256" cy="124" r="3" fill="#FFFFFF" />
+
+  <!-- Tactile Botanical Acorn / Field Seal Stamp at Base -->
+  <g transform="translate(256, 404)">
+    <circle cx="0" cy="12" r="10" fill="url(#rustGrad)" stroke="#243A18" stroke-width="2.5" />
+    <path d="M -6 8 Q 0 4 6 8" fill="none" stroke="#FAF7F0" stroke-width="2" stroke-linecap="round" />
+  </g>
+</svg>

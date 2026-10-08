@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 160" width="680" height="160">
+  <defs>
+    <linearGradient id="logoPaperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FAF7F0" />
+      <stop offset="100%" stop-color="#EDE7D5" />
+    </linearGradient>
+
+    <linearGradient id="logoSpruceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D461E" />
+      <stop offset="100%" stop-color="#1A2D12" />
+    </linearGradient>
+
+    <linearGradient id="logoLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#558C16" />
+      <stop offset="60%" stop-color="#3A6704" />
+      <stop offset="100%" stop-color="#243A18" />
+    </linearGradient>
+
+    <filter id="logoShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#14200E" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- ================= EMBLEM BADGE (LEFT) ================= -->
+  <g transform="translate(16, 16)">
+    <rect x="0" y="0" width="128" height="128" rx="26" fill="url(#logoSpruceGrad)" filter="url(#logoShadow)" />
+    <rect x="6" y="6" width="116" height="116" rx="20" fill="none" stroke="#FAF7F0" stroke-width="1.8" stroke-dasharray="6 4" opacity="0.45" />
+    <rect x="14" y="14" width="100" height="100" rx="16" fill="url(#logoPaperGrad)" stroke="#DDD6C4" stroke-width="1.2" />
+    <circle cx="64" cy="64" r="40" fill="none" stroke="#878118" stroke-width="1" stroke-dasharray="3 3" opacity="0.4" />
+
+    <line x1="64" y1="18" x2="64" y2="24" stroke="#243A18" stroke-width="2" stroke-linecap="round" />
+    <polygon points="64,16 62,20 66,20" fill="#A64B2A" />
+    <line x1="64" y1="104" x2="64" y2="110" stroke="#243A18" stroke-width="1.5" stroke-linecap="round" opacity="0.6" />
+    <line x1="18" y1="64" x2="24" y2="64" stroke="#243A18" stroke-width="1.5" stroke-linecap="round" opacity="0.6" />
+    <line x1="104" y1="64" x2="110" y2="64" stroke="#243A18" stroke-width="1.5" stroke-linecap="round" opacity="0.6" />
+
+    <path d="M 28 84 Q 48 94 60 80 T 88 50 Q 102 38 110 44" fill="none" stroke="#A64B2A" stroke-width="1.6" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.75" />
+
+    <path d="M 64 26
+             C 71 38, 87 43, 86 53
+             C 85 59, 80 62, 83 68
+             C 86 73, 92 76, 88 83
+             C 84 89, 75 86, 72 91
+             C 70 95, 69 101, 64 104
+             C 59 101, 58 95, 56 91
+             C 53 86, 44 89, 40 83
+             C 36 76, 42 73, 45 68
+             C 48 62, 43 59, 42 53
+             C 41 43, 57 38, 64 26 Z"
+          fill="url(#logoLeafGrad)"
+          stroke="#1A2D12"
+          stroke-width="2"
+          stroke-linejoin="round" />
+
+    <line x1="64" y1="32" x2="64" y2="102" stroke="#FAF7F0" stroke-width="2" stroke-linecap="round" opacity="0.9" />
+    <line x1="64" y1="48" x2="77" y2="43" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+    <line x1="64" y1="60" x2="77" y2="61" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+    <line x1="64" y1="72" x2="80" y2="76" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+    <line x1="64" y1="48" x2="51" y2="43" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+    <line x1="64" y1="60" x2="51" y2="61" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+    <line x1="64" y1="72" x2="48" y2="76" stroke="#FAF7F0" stroke-width="1.4" stroke-linecap="round" opacity="0.8" />
+
+    <circle cx="64" cy="26" r="3.5" fill="#A4D652" stroke="#243A18" stroke-width="1" />
+  </g>
+
+  <!-- ================= TYPOGRAPHY & WORDMARK (RIGHT) ================= -->
+  <text x="168" y="86"
+        font-family="'Fraunces', Georgia, 'Times New Roman', serif"
+        font-size="64"
+        font-weight="700"
+        letter-spacing="-0.025em"
+        fill="#243A18">Trailnote</text>
+
+  <circle cx="478" cy="62" r="7" fill="#A4D652" stroke="#243A18" stroke-width="2.5" />
+  <circle cx="478" cy="62" r="2.5" fill="#FAF7F0" />
+
+  <g transform="translate(170, 102)">
+    <rect x="0" y="0" width="220" height="24" rx="4" fill="#243A18" />
+    <text x="10" y="16"
+          font-family="'JetBrains Mono', Consolas, monospace"
+          font-size="11"
+          font-weight="700"
+          letter-spacing="0.12em"
+          fill="#FAF7F0">TOUCH GRASS // LOCAL AI</text>
+  </g>
+
+  <text x="404" y="118"
+        font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="12"
+        font-weight="500"
+        letter-spacing="0.04em"
+        fill="#665D4D">Outdoor Field Notebook &amp; Route Companion</text>
+
+  <line x1="170" y1="138" x2="656" y2="138" stroke="#DDD6C4" stroke-width="1.2" stroke-dasharray="4 4" />
+  <circle cx="656" cy="138" r="3" fill="#A64B2A" />
+</svg>
