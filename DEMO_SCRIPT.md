@@ -1,71 +1,74 @@
 # 🎬 TRAILNOTE — 90-SECOND DEMO SCRIPT
 
 > **Hacktoberfest 2026 — Open-Source AI Challenge Week 1: TOUCH GRASS**  
-> *Target Duration: Exactly 90 seconds (1 minute 30 seconds)*  
-> *Visual Tone: Quiet, deliberate, outdoor autumn field notebook aesthetic.*
+> *Target Duration: 60–90 seconds*  
+> *Tone: Quiet, direct, honest, outdoor field notebook aesthetic.*  
+> *Core Rule: "Plan the walk. Make the note. Put the phone away."*
 
 ---
 
 ## ⏱️ Timeline & Shot Breakdown
 
-### [0:00 - 0:15] — Scene 1: The Problem & The Touch Grass Manifesto
+### [0:00 - 0:15] — Scene 1: The Problem & The Touch Grass Philosophy
 - **Screen**: Landing Page (`http://localhost:3000/`)
-- **Visual**: Slow scroll past the Hero section ("Make a plan. Then leave it behind.") showing the autumn trail photograph, paper texture background, and the 7-step sequence.
+- **Visual**:
+  - Show the quiet paper-toned landing page and season-aware badge ("Season: Autumn foliage & seeds").
+  - Point out the honest status badge in the navbar: *"Guide: Gemma 2 active"* (or *"Guide: built-in rules"* on hosted demo).
 - **Spoken Audio**:
-  > *"Most outdoor apps want you glued to your phone with chimes, fitness scores, and continuous GPS drain. Trailnote is built on a single radical premise: the screen should be the shortest part of the walk. We use local open-weight AI to prepare a bespoke outdoor trail guide in under 3 minutes—so your phone stays in your pocket once your boots hit the dirt."*
-- **Action**: Click the primary button **`[ Plan a Walk ]`**.
+  > *"Most outdoor apps keep you glued to your phone with step goals, social feeds, and notification rings. Trailnote does the opposite: the screen should be the shortest part of the walk. We use local Gemma 2 to synthesize a field guide in under three minutes—so the phone stays in your pocket once your boots hit the trail."*
+- **Action**: Click **`[ Plan a Walk ]`**.
 
 ---
 
-### [0:15 - 0:35] — Scene 2: Location Search & High-Accuracy Pinpoint
-- **Screen**: Planning Page (`http://localhost:3000/plan`)
-- **Visual**: 
-  - Type "Seminary Hills" in the search box; show the instant OpenStreetMap Nominatim dropdown suggestions appear.
-  - Click **`[ Use My Current Location ]`**. Show the green **`DEVICE LOCATION PINPOINT`** card appear with `Accurate to ~12 m`.
-  - Point out that device location and trail location are cleanly separated: you can plan a walk anywhere in the world while keeping your device position intact.
+### [0:15 - 0:35] — Scene 2: Planning & Screen-Time Ledger
+- **Screen**: Planning Page (`/plan`)
+- **Visual**:
+  - Search a location (e.g. "Seminary Hills, Nagpur") using rate-throttled OpenStreetMap Nominatim search.
+  - Click **`[ Use My Current Location ]`** to show the strict separation between device GPS (`Accurate to ~12m`) and selected trail coordinates.
+  - Pick walking time (45 mins) and nature curiosities (Foliage, Bird songs, Basalt rocks).
+  - Note the invisible **Screen-Time Ledger** actively measuring planning time via the Page Visibility API.
 - **Spoken Audio**:
-  > *"On the Trail Permit page, we can search any park or reserve worldwide with rate-throttled OpenStreetMap geocoding. Or click 'Use My Current Location' to get a one-time high-accuracy GPS fix with zero background tracking. We state our walking time, choose our difficulty, and toggle our nature curiosities—like autumn leaf shapes and birdsong soundscapes."*
+  > *"On the planning permit, you choose your trail and curiosities. OpenStreetMap and OSRM compute the real footpath geometry, distance, and elevation. We never let the AI invent coordinates or physical numbers."*
 - **Action**: Click **`[ Issue Trail Permit & Generate Card ]`**.
 
 ---
 
-### [0:35 - 0:55] — Scene 3: Topographic Paper Map & Gemma 2 Briefing
-- **Screen**: Trail Result Guide (`http://localhost:3000/trail`)
+### [0:35 - 0:50] — Scene 3: The Trail Guide & Sunset Safety
+- **Screen**: Trail Result Guide (`/trail`)
 - **Visual**:
-  - Show the strict outdoor hierarchy: Metrics grid (4.8 km, 85 min, Moderate).
-  - The Leaflet **Paper Trail Map** with animated dashed trail flow (`.trail-flow-dash`), waypoint pins (S, 01, 02, F), and "YOU ARE HERE".
-  - Click **`[ ⌖ RECENTER TRAIL ]`** to demonstrate smooth geometry framing.
-  - Scroll over the **Topographic Elevation Profile SVG** showing the +134m mountain crest.
-  - Show the live **Open-Meteo weather strip** and the **Gemma 2 naturalist briefing**.
+  - Show the **Sunset Deadline**: *"Sunset: 18:04 · Be back by 17:19 (Safe return before nightfall)"*.
+  - Show the interactive Paper Trail Map and inline SVG elevation profile.
+  - Show the **Gemma 2 naturalist briefing** and sensory observation targets.
 - **Spoken Audio**:
-  > *"Trailnote computes our exact foot loop and elevation climb via OSRM, pulls live weather from Open-Meteo, and renders an animated paper map with an inline topographic elevation profile. Gemma 2, running completely locally on our device via Ollama, synthesizes a quiet naturalist briefing and three sensory challenges to engage our eyes and ears outside."*
+  > *"Trailnote computes our sunset deadline with Open-Meteo to guarantee safe daylight return, renders an elevation profile, and uses local Gemma 2 to give us three specific things to notice with our eyes, ears, and touch."*
 - **Action**: Click **`[ Make Trail Card ]`**.
 
 ---
 
-### [0:55 - 1:15] — Scene 4: The Signature Trail Card & A4 Printing
-- **Screen**: Signature Trail Card (`http://localhost:3000/trail-card`)
+### [0:50 - 1:10] — Scene 4: Handheld Trail Card & Pocket Mode
+- **Screen**: Trail Card (`/trail-card`) → Walk Mode (`/walk`)
 - **Visual**:
-  - Show the physical card layout: offline vector route snapshot SVG, packing essentials, sensory observation prompts, and physical ruled lines for pencil notes.
-  - Click **`[ Print Card ]`** (briefly show the clean monochrome A4 print preview with zero browser headers/footers).
-  - Click **`[ Download .txt ]`** to show instant plain-text export.
+  - Show the printable **Trail Card** with inline vector route SVG that works completely offline.
+  - Show the **A4 & Pocket-Fold** print layout with folding guidelines.
+  - Click **`[ Start Walk ]`** to enter Walk Mode.
+  - Switch to **`[ Pocket Mode ]`**: screen turns near-black, high contrast, 48px+ touch target with **"Tap to reveal"**, opt-in speech synthesis prompt, and automatic screen wake lock release.
 - **Spoken Audio**:
-  > *"This is the centerpiece: the Trail Card. It includes a 100% offline vector route snapshot, essential gear, and physical ruled lines for taking handwritten pencil notes. You can print it on A4 paper, export it as a lightweight text file, fold it into your pocket, and step through the front door."*
-- **Action**: Click **`[ Start Walk (Quiet Mode) ]`**, then transition to **`[ Field Notes ]`**.
+  > *"You can print this pocket-fold card on paper, or enter Pocket Mode on your phone: a near-black, low-power screen that releases the wake lock and reads prompts aloud with browser speech synthesis so you never need to look down."*
+- **Action**: Click **`[ Finish Walk ]`**.
 
 ---
 
-### [1:15 - 1:30] — Scene 5: Sensory Field Notes & Gemma Prose Shaping
-- **Screen**: Field Notes (`/field-notes`) → Journal (`/journal`)
+### [1:10 - 1:30] — Scene 5: Ledger Metrics & Offline Field Journal
+- **Screen**: Walk Finished Screen → Journal (`/journal`)
 - **Visual**:
-  - Show recorded sensory notes: Sight (Teak leaf veins), Sound (Canopy wind), Texture (Basalt outcrop).
-  - Show attached local photograph (100% on device).
-  - On the Journal page, highlight the **ORIGINAL NOTE** preserved word-for-word, and click **`[ Shape This Note ]`** to reveal the lyrical Nan Shepherd / John Muir prose generated by Gemma 2.
+  - Point out the **Screen-Time Ledger**: *"Planned in 2m 14s. Outside for 46m 30s."*
+  - Take a field photo with camera (`capture="environment"`), stored 100% locally in IndexedDB as a compressed Blob.
+  - In Journal, show the raw note preserved, and click **`[ Shape This Note ]`** to show Gemma 2 transforming the field notes into quiet prose with an explicit Accept/Reject button.
 - **Spoken Audio**:
-  > *"When you return from your walk, you record what you touched, heard, and observed. In your journal, your authentic human words are preserved forever, while Gemma 2 shapes a lyrical field reflection. Zero cloud tracking, zero paid APIs, and zero bloat. Plan the walk. Make the note. Put the phone away."*
+  > *"When the walk finishes, the ledger confirms: planned in two minutes, outside for forty-six. Your notes and compressed photos stay in your browser disk. Zero cloud database, zero paid APIs, zero tracking. Plan the walk. Make the note. Put the phone away."*
 - **Closing Title Card**:
   > **TRAILNOTE**  
   > Hacktoberfest 2026 // TOUCH GRASS  
-  > *github.com/your-username/trailnote*
+  > *github.com/AnshMeshram/TrailNote · trailnote.netlify.app*
 
 ---

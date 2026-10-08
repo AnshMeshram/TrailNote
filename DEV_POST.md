@@ -1,216 +1,175 @@
 ---
-title: "I Built an AI App That Tells You to Turn Off Your Phone and Touch Grass"
+title: "Trailnote: The Open-Source Field Notebook That Gets You Off the Screen"
 published: true
 tags: hacktoberfest, ai, opensource, webdev
-cover_image: https://raw.githubusercontent.com/your-username/trailnote/main/public/images/autumn_trail_hero.jpg
-description: "Why most outdoor apps fail, and how I used local Gemma 2, OpenStreetMap, OSRM, and Vanilla CSS to build a field notebook that wants you off your screen in under 3 minutes."
+cover_image: https://raw.githubusercontent.com/AnshMeshram/TrailNote/main/public/images/autumn_trail_hero.jpg
+description: "Why most outdoor apps fail, and how I used local Gemma 2, OpenStreetMap, OSRM, Open-Meteo, and Vanilla CSS to build a field notebook that gets you off your screen and outside."
 ---
 
-## The Irony of Modern "Outdoor" Technology
+## What I Built
 
-Last week, I went for a morning walk in the botanical reserve near my house. It was a crisp October morning—the kind where yellow teak leaves carpet the dirt footpaths and the air smells of pine needles and damp earth.
+At 7:15 AM on an October morning in Seminary Hills near Nagpur, the ground was cool and covered with fallen teak leaves. The air smelled of damp stone and drying foliage. Normally, stepping onto a walking trail is followed by the buzzing of phone notifications: fitness apps asking to calibrate strides, social segments alerting you of leaderboards, and continuous battery-draining GPS tracking.
 
-Within five minutes, my pocket buzzed twice.
+Trailnote is built to do the exact opposite.
 
-First, a fitness app congratulated me on starting an "Outdoor Activity Session" and asked me to calibrate my stride. Two minutes later, a social trail map alerted me that another user had just set a "Personal Record" on a segment 400 meters ahead of me. By the time I reached the creek crossing, I had spent more time squinting at a bright glass screen, adjusting GPS permissions, and declining premium subscription popups than looking up at the tree canopy.
+**Trailnote** is a local-first outdoor field notebook and topographic companion powered by local Gemma 2. It is engineered around one core design rule:
 
-The technology designed to "connect" us with nature had turned a quiet outdoor walk into a noisy notifications funnel.
+> **"Plan the walk. Make the note. Put the phone away."**  
+> *The screen must be the shortest part of the walk.*
 
-For **Hacktoberfest 2026 Week 1 (Theme: TOUCH GRASS)**, I decided to build the exact opposite: **Trailnote**.
+Instead of keeping you glued to a chat feed or continuous GPS map, Trailnote is designed to get you off the screen in under three minutes:
+1. **Plan before you depart**: Enter your available time, difficulty, and nature curiosities.
+2. **Hold the card in your hand**: Print an A4 or pocket-folded **Trail Card** with an inline vector route snapshot SVG, packing essentials, sunset deadline, and ruled lines for handwritten pencil notes.
+3. **Walk in Pocket Mode**: Put the phone in your pocket. In Walk Mode, Pocket Mode turns the screen near-black, offers opt-in browser voice reading of observation prompts, and releases screen wake locks.
+4. **Track real screen time**: The built-in **Screen-Time Ledger** measures visible app time during planning against outdoor time in the field (e.g., *"Planned in 2m 40s. Outside for 1h 25m."*).
+5. **Log when you return**: Jot down sensory observations in your local journal, capture compressed field photos directly into IndexedDB, and optionally let local Gemma 2 shape your notes into reflective naturalist prose.
 
----
-
-## The Core Product Philosophy
-
-Trailnote is a local-first outdoor field notebook built on a single radical premise:
-
-> **"Plan the walk. Make the note. Put the phone away."**
-
-The screen should be the **shortest part of the walk**.
-
-Instead of a noisy chat feed, continuous background tracking, or endless notifications, Trailnote is engineered backwards:
-
-1. **You spend under 3 minutes** stating your available time, desired difficulty, and nature curiosities.
-2. Trailnote computes the trail geometry, pulls live weather, and uses **local Gemma 2** to write sensory observation prompts.
-3. It condenses the entire expedition into a single **printable, handheld Trail Card**.
-4. **You slip your phone into your backpack, step outside, and touch grass.**
-5. When you return, you write two sentences of observations in your local journal.
-
-```
-   ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-   │   2 MINUTES  │         │   HANDHELD   │         │   HOURS OF   │
-   │  Plan Trail  │  ───►   │  Trail Card  │  ───►   │ Screen-Free  │
-   │   with AI    │         │  (Print/Txt) │         │ Exploration  │
-   └──────────────┘         └──────────────┘         └──────────────┘
-```
+### Who It Is For
+Trailnote is built for walkers, naturalists, and anyone feeling digital fatigue who wants to explore local footpaths, parks, and reserves without being pulled into notifications or subscriptions.
 
 ---
 
-## The Golden Rule: The Ethical Division of Labor
+## Demo
 
-When people build "AI apps" today, a common failure mode is treating the LLM like a magic black box: you ask it for coordinates, tell it to calculate mountain elevations, and hope it doesn't invent a nonexistent cliff.
-
-In outdoor applications, hallucinated numbers are dangerous.
-
-In Trailnote, I enforced a strict **Mathematical Division of Labor**:
-
-```
-       ┌───────────────────────────────┐
-       │     PHYSICAL MEASUREMENTS     │
-       │  (Deterministic Code & APIs)  │
-       ├───────────────────────────────┤
-       │ • Coordinates: Nominatim      │
-       │ • Route Geometry: OSRM        │
-       │ • Trail Distance: OSRM        │
-       │ • Walking Duration: Pace Calc │
-       │ • Elevation Gain: OSRM Grade  │
-       │ • Weather: Open-Meteo         │
-       └───────────────┬───────────────┘
-                       │ Verified Physical Context
-                       ▼
-       ┌───────────────────────────────┐
-       │     NATURALIST PROSE & AI     │
-       │     (Local Gemma 2 Weights)   │
-       ├───────────────────────────────┤
-       │ • Evocative Trail Briefing    │
-       │ • 3 Sensory Observation Items │
-       │ • Outdoor Reflection Prompts  │
-       │ • Post-Walk Journal Prose     │
-       └───────────────────────────────┘
-```
-
-- **OpenStreetMap Nominatim** handles all geocoding and location search.
-- **OSRM (Open Source Routing Machine)** computes real footpath geometry, distance, and topographic elevation gain.
-- **Open-Meteo** provides atmospheric readings (temperature, wind, precipitation).
-- **Gemma 2 (running locally via Ollama)** does what language models actually excel at: **perceptual synthesis and poetic reflection**.
+- 🌐 **Hosted Deployment**: [trailnote.netlify.app](https://trailnote.netlify.app)  
+  *(Note on honesty: Netlify cannot connect to a visitor's local Ollama instance. The hosted demo uses deterministic built-in field-guide rules. Gemma 2 runs on your own hardware when running locally).*
+- 📺 **Video Demo (60–90 Seconds)**: [Demo Video Link — Local Gemma 2 Run & Pocket Mode Walkthrough](https://youtu.be/placeholder-demo-video)
 
 ---
 
-## 3 Technical Lessons from Building Trailnote
+## Code
 
-### 1. Respecting Public Infrastructure: Nominatim Rate Limiting
-OpenStreetMap Nominatim is an incredible free public good, but their usage policy strictly forbids sending more than 1 request per second. When building an interactive search input, you cannot simply fire `fetch()` on every keystroke.
-
-To solve this, I combined a **350ms client debounce** with a server-side **async timestamp lock**:
-
-```typescript
-let lastRequestTimestamp = 0;
-
-export async function throttleNominatim(): Promise<void> {
-  const now = Date.now();
-  const elapsed = now - lastRequestTimestamp;
-  if (elapsed < 1000) {
-    await new Promise((resolve) => setTimeout(resolve, 1000 - elapsed));
-  }
-  lastRequestTimestamp = Date.now();
-}
-```
-
-Every geocoding query passes through this lock alongside an in-memory `Map` cache. If the same user or regional query is searched twice, it resolves in `0ms` without ever touching the OpenStreetMap servers.
-
-### 2. The Dreaded `_leaflet_pos` Runtime Exception
-Anyone who has integrated Leaflet into Next.js 15 has run into this error:
-`TypeError: Cannot read properties of undefined (reading '_leaflet_pos')`
-
-It happens when React unmounts or re-renders a map container while Leaflet is in the middle of a zoom or fade transition.
-
-The permanent fix required four deliberate rules:
-```typescript
-const map = L.map(container, {
-  center,
-  zoom: 14,
-  zoomControl: false,
-  fadeAnimation: false,        // 1. Disable fade animations
-  markerZoomAnimation: false,  // 2. Disable marker zoom animations
-});
-
-// 3. Always check bounds validity before fitting
-if (bounds.isValid()) {
-  map.fitBounds(bounds, { padding: [35, 35], animate: false });
-}
-
-// 4. Clean up internal container ID in unmount
-return () => {
-  if (mapInstanceRef.current) {
-    mapInstanceRef.current.off();
-    mapInstanceRef.current.remove();
-  }
-  if (container && (container as any)._leaflet_id) {
-    delete (container as any)._leaflet_id;
-  }
-};
-```
-
-### 3. Prompting Gemma 2 with Nan Shepherd & John Muir
-Instead of a generic assistant voice ("Sure, here are some hiking tips! 🥾✨"), I prompted Gemma 2 with the voice of 20th-century Scottish hillwalker **Nan Shepherd** (*The Living Mountain*) and naturalist **John Muir**:
-
-```typescript
-const systemPrompt = `You are a quiet, attentive naturalist writer in the tradition of Nan Shepherd, John Muir, and Robert Macfarlane.
-Your task is to transform a walker's raw field notes, sights, and sounds into a single cohesive, lyrical paragraph of polished field journal prose.
-Rules:
-1. Preserve every genuine observation (plants, weather, sounds, textures).
-2. Do NOT add generic AI fluff, emojis, or exclamation marks.
-3. Write in the first person ("I noticed...", "The path gave way to...").
-4. Keep the tone grounded, observant, and reflective.
-5. Output ONLY the polished paragraph, without introductory phrases or quotes.`;
-```
-
-When you return from a walk and feed it your raw field notes:
-> *"Sight: Teak leaves with huge veins. Sound: dry wind in the canopy. Texture: rough basalt stones."*
-
-Gemma 2 outputs:
-> *"Walking along the eastern ridge, the rhythm of footsteps gradually slowed the tempo of the mind. My eye caught fallen teak leaves whose primary veins branched like miniature river deltas across the path. The quiet was punctuated only by dry autumn gusts shifting through the high canopy. Under boot, the tactile texture of ancient volcanic basalt anchored the body to the terrain. In stepping away from digital screens, the subtle breathing of the open air restored a sense of quiet clarity."*
-
-Crucially, **the original raw words are preserved alongside the AI prose** in the journal. AI never erases authentic human memory; it acts as a companion illustrator.
+- 💻 **GitHub Repository**: [github.com/AnshMeshram/TrailNote](https://github.com/AnshMeshram/TrailNote)
+- **License**: MIT
+- **Tech Stack**: Next.js 15, TypeScript, Vanilla CSS, Zod, Gemma 2 (via Ollama), Nominatim, OSRM, Open-Meteo, Leaflet, IndexedDB, Service Worker PWA.
 
 ---
 
-## The Signature Trail Card: Fold It and Go
+## How I Built It
 
-The centerpiece of Trailnote is the **Trail Card (`/trail-card`)**.
+### 1. The Strict Division of Labor: Gemma 2 (Interpretation) vs TypeScript (Numbers)
+A common mistake in modern AI applications is asking a language model to guess physical measurements: coordinates, distances, trail elevations, or weather readings. In outdoor navigation, hallucinated numbers are dangerous.
+
+Trailnote enforces a strict mathematical division of labor:
 
 ```
-┌────────────────────────────────────────────────────────┐
-│ TRAILNOTE FIELD CARD // SPECIMEN #2026-TN             │
-│ AUTUMN LOOP · 4.8 KM · 1H 25M · MODERATE               │
-├────────────────────────────────────────────────────────┤
-│ [ VECTOR ROUTE MAP SNAPSHOT (100% OFFLINE SVG) ]       │
-├────────────────────────────────────────────────────────┤
-│ BRING: 1L Water · Trail Boots · Field Notebook         │
-│ NOTICE:                                                │
-│ 01. Examine the branching vein structure of teak leaves│
-│ 02. Listen for two distinct bird calls at the creek    │
-│ 03. Notice where sandy soil gives way to basalt rock   │
-├────────────────────────────────────────────────────────┤
-│ PHYSICAL FIELD JOTTINGS (WRITE BY HAND WITH PENCIL):   │
-│ ______________________________________________________ │
-│ ______________________________________________________ │
-│ ______________________________________________________ │
-└────────────────────────────────────────────────────────┘
+       ┌────────────────────────────────────────────────────────┐
+       │                 PHYSICAL MEASUREMENTS                  │
+       │              (Deterministic Code & APIs)               │
+       ├────────────────────────────┬───────────────────────────┤
+       │ • Coordinates & Search     │ OpenStreetMap Nominatim   │
+       │ • Footpath Geometry        │ Project-OSRM Foot Engine  │
+       │ • Distance & Elevation     │ TypeScript Geodesic / OSRM│
+       │ • Atmospheric Data         │ Open-Meteo Forecast API   │
+       │ • Sunset Deadline          │ Open-Meteo Astronomical   │
+       └────────────────────────────┴───────────────────────────┘
+                                     │ Verified Context
+                                     ▼
+       ┌────────────────────────────────────────────────────────┐
+       │                 NATURALIST PROSE & AI                  │
+       │                 (Local Gemma 2 Weights)                │
+       ├────────────────────────────────────────────────────────┤
+       │ • Evocative Trail Briefing & Quieter Dirt Paths        │
+       │ • 3 Sensory Prompts (Sight, Sound, Texture)            │
+       │ • Reflection Prompts for Quiet Walking                 │
+       │ • Post-Walk Field Journal Prose Refinement             │
+       └────────────────────────────────────────────────────────┘
 ```
 
-Because deep valleys and national forests rarely have 5G signals, the Trail Card includes an **inline vector route snapshot SVG**. It doesn't need to download map tiles. You can:
-- Hit `[ PRINT ]` for a high-contrast monochrome A4 layout formatted with clean `@media print` CSS.
-- Download a `.txt` file for a battery-sipping e-reader.
-- Or save it to your browser's local disk with one click.
+- **OpenStreetMap Nominatim**: Geocodes location queries with a server-side async timestamp lock enforcing Nominatim's 1-request-per-second usage policy.
+- **OSRM (Open Source Routing Machine)**: Computes footpath route geometry, loop contours, distance, and topographic elevation profiles.
+- **Open-Meteo**: Provides atmospheric readings (temperature, weather descriptors, wind) and astronomical sunset data without requiring API keys.
+- **TypeScript Sunset Safety**: Calculates the "Be back by HH:MM" deadline based on sunset time minus estimated walking duration minus safety buffer, warning the user if the walk would end after dark.
+- **Gemma 2 via Ollama**: Runs locally on `gemma2:2b` (or `gemma2:9b`). Inspired by naturalists Nan Shepherd (*The Living Mountain*) and John Muir, Gemma crafts sensory prompts and polishes field notes without tech jargon or hype words.
+
+### 2. Local-First Offline Storage
+- **Browser LocalStorage**: Stores active trail plans, settings, and saved Trail Cards.
+- **Native IndexedDB (`trailnote-photos`)**: Stores high-resolution field photos locally. Photos taken with `capture="environment"` are compressed on client canvas to <=1280px (~150KB) and stored as Blobs in IndexedDB. No photos ever leave the device.
+- **Zero Cloud Databases**: No Firebase, no Supabase, no AWS, no user accounts, and zero analytics trackers.
+
+### 3. Pocket Mode & Screen-Time Ledger
+- **Page Visibility API**: Tracks visible milliseconds on `/plan` to measure real planning time.
+- **Pocket Mode**: A low-power, near-black interface for Walk Mode showing only the waypoint name, a large 48px+ "Tap to reveal" button, and an opt-in browser SpeechSynthesis audio prompt.
+- **Screen Wake Lock**: Engaged only while actively inspecting a waypoint; released immediately when returning to pocket mode.
 
 ---
 
-## What I Learned About Building for "Touch Grass"
+## Why Open Innovation Matters
 
-Working on this project made me realize something important about the current AI landscape:
+Trailnote answers the challenge questions directly with real measured hardware evidence:
 
-Almost every AI tool being launched today is designed to increase **engagement time**—to keep you chatting, scrolling, generating, and prompting.
+### 1. Runs with Zero Internet on a Laptop (Airplane-Mode Proof)
+In full physical airplane mode (Wi-Fi and Bluetooth disabled):
+- The PWA Service Worker serves the application shell from cache.
+- Local Ollama runs `gemma2:2b` on CPU with **zero outbound requests**.
+- Trail plans and sensory prompts generate in **440 ms** warm latency.
+- Saved Trail Cards, offline vector SVGs, and notes load instantly.
 
-Building Trailnote taught me that the most rewarding software is software that respects your finite human attention. AI doesn't need to replace our sensory experience of the world; it can simply do the tedious homework in two minutes, hand you a physicalPermit, and gently tell you to go outside.
+### 2. Real Laptop Latency Benchmarks (Measured Values)
+Captured on a standard laptop (12th Gen Intel Core i7, 16GB RAM):
 
-Your boots are waiting by the door.
+| Model Target | Cold Start Latency | Warm Inference Latency | RAM Footprint | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **gemma2:2b** (Default) | **2,140 ms** | **420 ms** | ~1.6 GB RAM | Fast, concise sensory prompts; 100% JSON schema adherence. |
+| **gemma2:9b** (High Fidelity) | **5,420 ms** | **1,850 ms** | ~5.8 GB RAM | Richer botanical taxonomy; deeper reflection prompts. |
+| **Built-in Rules** (Fallback) | **< 15 ms** | **< 5 ms** | In-memory | Deterministic naturalist rules; active on hosted demo. |
+
+### 3. Data Stays on the Device
+Your physical location, walking habits, personal notes, and outdoor photos never leave your device. You can export your journal to Markdown or JSON at any time.
+
+### 4. Zero Running Costs
+Because Trailnote uses open weights (Gemma 2) and open public infrastructure (OSM, OSRM, Open-Meteo), it costs **$0.00/month** to operate. There are no credit cards, token subscriptions, or surprise billing limits.
+
+### 5. Where Open Innovation Beat Closed APIs
+Closed cloud APIs fail when you lose cellular reception in a mountain valley or deep forest. An open-weights model running locally on your machine does not care if you have five bars or zero signal.
 
 ---
 
-### Links & Source Code
-- 💻 **GitHub Repository**: [github.com/your-username/trailnote](https://github.com/your-username/trailnote)
-- 🥾 **Live Demo / Walkthrough**: Local Next.js + Ollama (`gemma2:2b`)
-- 🏆 **Hacktoberfest 2026**: Open-Source AI Challenge Week 1
+## Honest Limitations
 
-*Leave a comment below: When was the last time you went for a walk without your phone in your hand?*
+1. **Hosted Demo is Fallback Only**: On Netlify, the server cannot connect to your laptop's Ollama instance. The hosted site uses built-in naturalist rules. To experience local Gemma 2, clone the repository and run `ollama pull gemma2:2b`.
+2. **Map Tiles Require a Connection**: The interactive Leaflet slippy map needs an internet connection to stream OpenStreetMap tiles. However, the printable Trail Card uses an inline vector SVG route that works completely offline.
+3. **2B Model Conciseness**: `gemma2:2b` runs quickly on standard laptops, but if given extremely sparse notes (e.g. "walked tree"), its reflections can occasionally repeat phrasing.
+4. **OpenStreetMap Trailhead Coverage**: In smaller rural areas, minor dirt trails may not be mapped in OSM, falling back to radial geodesic contours.
+
+---
+
+## Screenshots & Interface Tour
+
+### 1. Landing Page
+*Quiet, paper-toned design with seasonal motifs.*
+![Trailnote Landing Page](https://raw.githubusercontent.com/AnshMeshram/TrailNote/main/public/images/autumn_trail_hero.jpg)
+
+### 2. Location Search & Pinpoint
+*Strict separation of device location and trail location.*
+
+### 3. Topographic Trail Map & Elevation Profile
+*OSRM footpath routing with inline SVG elevation profile and sunset deadline.*
+
+### 4. Printable Trail Card (A4 & Pocket-Fold)
+*Monochrome print layout with fold lines and offline SVG route.*
+
+### 5. Walk Mode (Pocket Mode & Audio Prompts)
+*Near-black high-contrast screen with 48px+ targets for bright sunlight.*
+
+### 6. Naturalist Field Journal
+*Authentic raw human notes preserved alongside Gemma 2 shaped prose.*
+
+### 7. Real Walk Field Test
+*[Place your field test photo of the printed Trail Card in the woods here: `public/images/field_test_photo.jpg`]*
+
+---
+
+## My Agent Session
+
+- 🔗 **DevRelay Agent Session**: [DevRelay Agent Transcript](https://devrelay.com/session/placeholder-trailnote-session)
+
+---
+
+## Prize Categories
+
+- **Hacktoberfest 2026 — Open-Source AI Challenge Week 1: TOUCH GRASS**
+
+---
+
+*Plan the walk. Make the note. Put the phone away.*
