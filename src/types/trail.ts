@@ -132,4 +132,5 @@ export interface FieldJournalEntry {
   texture?: string;
   favoriteMoment?: string;
   shapedNote?: string;
+  shapedSource?: 'gemma2' | 'naturalist-fallback';
 }

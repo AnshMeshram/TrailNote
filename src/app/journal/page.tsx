@@ -41,6 +41,7 @@ export default function JournalPage() {
           texture: 'Rough basalt outcrops and dry soil',
           shapedNote:
             'Under the quiet canopy of Seminary Hills, the morning unfolded in slow cadence. Teak leaves blanketed the earth in brittle rust, releasing a dry autumn fragrance at every step. In the silence between breaths, a purple sunbird called from the basalt ridge, anchoring the ascent in the tactile terrain of rock and tree. With devices left in airplane mode, the living landscape stepped forward into focus.',
+          shapedSource: 'naturalist-fallback',
         },
         {
           id: 'log-02',
@@ -86,7 +87,13 @@ export default function JournalPage() {
         const data = await res.json();
         if (data.success && data.shapedNote) {
           const updated = entries.map((e) =>
-            e.id === entry.id ? { ...e, shapedNote: data.shapedNote } : e
+            e.id === entry.id
+              ? {
+                  ...e,
+                  shapedNote: data.shapedNote,
+                  shapedSource: (data.source === 'gemma2' ? 'gemma2' : 'naturalist-fallback') as 'gemma2' | 'naturalist-fallback',
+                }
+              : e
           );
           setEntries(updated);
           const target = updated.find((e) => e.id === entry.id);
@@ -274,7 +281,7 @@ export default function JournalPage() {
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <span className="field-label" style={{ color: 'var(--green-deep)' }}>
-                        AI FIELD NOTE // NATURALIST PROSE (GEMMA 2)
+                        FIELD NOTE // NATURALIST PROSE ({walk.shapedSource === 'gemma2' ? 'GEMMA 2' : 'BUILT-IN RULES'})
                       </span>
                       <span className="field-stamp green" style={{ fontSize: '0.65rem' }}>
                         REFINED

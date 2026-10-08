@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     'Gemma 2',
     'touch grass',
     'Hacktoberfest 2026',
-    'offline maps',
+    'printable trail card',
   ],
   authors: [{ name: 'Trailnote Naturalist Guild' }],
   icons: {

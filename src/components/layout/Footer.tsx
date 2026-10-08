@@ -80,19 +80,19 @@ export function Footer() {
             <div className="field-label" style={{ marginBottom: '1rem' }}>OPEN-SOURCE ECOLOGY</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
               <div>
-                <strong>Gemma 2:</strong> Local private inference via Ollama
+                <strong>Gemma 2:</strong> Runs locally on your machine via Ollama
               </div>
               <div>
-                <strong>OpenStreetMap:</strong> Global community cartography (&copy; contributors)
+                <strong>OpenStreetMap:</strong> Cartography (&copy; OpenStreetMap contributors)
               </div>
               <div>
-                <strong>Nominatim:</strong> Reverse geocoding & locality resolution
+                <strong>Nominatim:</strong> Place search &amp; geocoding
               </div>
               <div>
-                <strong>OSRM:</strong> Open source routing machine footpath geometry
+                <strong>OSRM:</strong> Route geometry &amp; footpath distances
               </div>
               <div>
-                <strong>Open-Meteo:</strong> Open meteorological forecasts (no API key)
+                <strong>Open-Meteo:</strong> Live atmospheric forecasts
               </div>
             </div>
           </div>
@@ -103,8 +103,11 @@ export function Footer() {
               <CompassMark size={44} bearing={32} />
               <div>
                 <div className="field-stamp green">FIELD LOG // READY</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ink-muted)', marginTop: '0.2rem' }}>
-                  NO TRACKING · NO CLOUD LOCK-IN · 100% OFFLINE CAPABLE
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ink-muted)', marginTop: '0.35rem', lineHeight: 1.4 }}>
+                  <div>Your notes stay on this device.</div>
+                  <div style={{ marginTop: '0.2rem', color: 'var(--ink-muted)' }}>
+                    Saved Trail Cards, notes and journal work with no signal. Map tiles need a connection.
+                  </div>
                 </div>
               </div>
             </div>

@@ -51,6 +51,8 @@ export function Navigation() {
     { href: '/settings', label: 'Settings' },
   ];
 
+  const [showNotice, setShowNotice] = useState(false);
+
   return (
     <header className="site-header">
       <div className="container">
@@ -89,16 +91,18 @@ export function Navigation() {
 
           {/* Right Status & Actions */}
           <div className="nav-actions">
-            {/* Local AI Health Badge */}
-            <Link
-              href="/settings"
+            {/* Honest Neutral Field Guide Status Badge */}
+            <button
+              type="button"
+              onClick={() => setShowNotice(true)}
               className={`ai-health-badge ${aiStatus === 'ready' ? 'ready' : 'fallback'}`}
-              title="Local AI Inference Status · Ollama Gemma 2"
+              title="Click to view AI & Field Guide execution status"
               id="local-ready-badge"
+              style={{ cursor: 'pointer', background: 'none' }}
             >
               <span className="ai-health-dot" />
-              <span>{aiStatus === 'ready' ? 'LOCAL AI ● READY' : 'LOCAL AI ● FALLBACK'}</span>
-            </Link>
+              <span>{aiStatus === 'ready' ? 'Guide: Gemma 2 active' : 'Guide: built-in rules'}</span>
+            </button>
 
             {/* Tactical Settings Icon Link */}
             <Link
@@ -212,6 +216,89 @@ export function Navigation() {
               </Link>
             );
           })}
+        </div>
+      )}
+
+      {/* Hosted Demo Explanation Modal */}
+      {showNotice && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Hosted Demo Notice"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(20, 26, 16, 0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 'var(--z-modal)',
+            padding: '1rem',
+          }}
+          onClick={() => setShowNotice(false)}
+        >
+          <div
+            className="paper-card"
+            style={{
+              maxWidth: '480px',
+              width: '100%',
+              padding: '1.75rem',
+              backgroundColor: 'var(--paper-card)',
+              border: '2px solid var(--paper-border-dark)',
+              boxShadow: 'var(--shadow-tactile)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <span className="field-stamp green">
+                {aiStatus === 'ready' ? 'GUIDE: GEMMA 2 ACTIVE' : 'GUIDE: BUILT-IN RULES'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowNotice(false)}
+                aria-label="Close Notice"
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--ink-soft)',
+                  padding: '0.25rem',
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--ink-primary)', marginBottom: '0.85rem' }}>
+              This hosted demo uses built-in field-guide rules. Gemma 2 runs on your own machine. See the demo video or run it locally with <code>ollama pull gemma2:2b</code>.
+            </p>
+
+            <p style={{ fontSize: '0.8rem', color: 'var(--ink-muted)', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+              The AI runs on your machine. Place search, routes and weather come from open public services (Nominatim, OSRM, Open-Meteo).
+            </p>
+
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+              <Link
+                href="/settings"
+                onClick={() => setShowNotice(false)}
+                className="btn-secondary"
+                style={{ padding: '0.45rem 0.85rem', fontSize: '0.82rem' }}
+              >
+                Model Settings
+              </Link>
+              <button
+                type="button"
+                onClick={() => setShowNotice(false)}
+                className="btn-primary"
+                style={{ padding: '0.45rem 1rem', fontSize: '0.82rem' }}
+              >
+                Understood
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </header>

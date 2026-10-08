@@ -13,6 +13,7 @@ import { OutdoorChecklist } from '@/components/ui/OutdoorChecklist';
 import { ObservationPrompt } from '@/components/ui/ObservationPrompt';
 import { getActiveTrail } from '@/lib/storage/offline-store';
 import { TrailPlan, TrailCardData } from '@/types/trail';
+import { getSeason } from '@/lib/season';
 
 export default function TrailCardPage() {
   const [activePlan, setActivePlan] = useState<TrailPlan | null>(null);
@@ -27,10 +28,12 @@ export default function TrailCardPage() {
     }
   }, []);
 
+  const seasonInfo = getSeason(new Date(), activePlan?.waypoints?.[0]?.coordinate?.lat || 21.16);
+
   // Canonical fallback specimen
   const specimen = activePlan || {
     id: 'specimen-01',
-    name: 'AUTUMN LOOP',
+    name: `${seasonInfo.label.toUpperCase()} · SEMINARY HILLS`,
     location: 'Seminary Hills Reserve · Nagpur, Maharashtra',
     distanceKm: 4.8,
     durationMinutes: 85,

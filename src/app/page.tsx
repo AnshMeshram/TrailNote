@@ -6,8 +6,11 @@ import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { CompassMark } from '@/components/ui/CompassMark';
 import { DifficultyBadge } from '@/components/ui/DifficultyBadge';
 import { OfflineNotice } from '@/components/ui/OfflineNotice';
+import { getSeason } from '@/lib/season';
 
 export default function HomePage() {
+  const currentSeason = getSeason(new Date());
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-y)', paddingBottom: 'var(--section-y)' }}>
       {/* HERO SECTION */}
@@ -61,7 +64,7 @@ export default function HomePage() {
                   marginBottom: '2rem',
                 }}
               >
-                Trailnote uses local open-weight AI to prepare a bespoke outdoor trail guide, weather briefing, and observation card — so your phone stays in your pocket once your boots hit the dirt.
+                Trailnote prepares a practical outdoor trail guide, route, and observation card — so your phone stays in your pocket once your boots hit the dirt. The AI runs on your machine. Place search, routes and weather come from open public services (Nominatim, OSRM, Open-Meteo).
               </p>
 
               {/* Action Buttons */}
@@ -77,33 +80,21 @@ export default function HomePage() {
                 </a>
               </div>
 
-              {/* Quiet Micro-stats / Philosophy Note */}
+              {/* Single Line of Honest Metadata */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '1.75rem',
-                  paddingTop: '1.5rem',
+                  gap: '0.75rem',
+                  paddingTop: '1.25rem',
                   borderTop: '1px dashed var(--paper-border-dark)',
                   flexWrap: 'wrap',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span className="neon-dot" />
-                  <span className="field-label" style={{ color: 'var(--ink-soft)' }}>
-                    LOCAL GEMMA 2 INFERENCE
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span className="field-label" style={{ color: 'var(--ink-soft)' }}>
-                    TARGET: &lt; 3 MIN SCREEN TIME
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span className="field-label" style={{ color: 'var(--autumn-rust)' }}>
-                    100% OFFLINE PRINTABLE
-                  </span>
-                </div>
+                <span className="neon-dot" />
+                <span className="field-label" style={{ color: 'var(--ink-muted)', letterSpacing: '0.06em' }}>
+                  LOCAL FIELD COMPANION // BUILT-IN RULES &amp; GEMMA 2 · PUBLIC GEOGRAPHY
+                </span>
               </div>
             </div>
 
@@ -131,11 +122,11 @@ export default function HomePage() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <span className="field-label">PLATE // AUTUMN LOOP</span>
-                    <span className="field-stamp green">TRAILWAY SPECIMEN</span>
+                    <span className="field-label">SAMPLE CARD // {currentSeason.label.toUpperCase()}</span>
+                    <span className="field-stamp green">ILLUSTRATION</span>
                   </div>
                   <span className="field-label" style={{ color: 'var(--ink-muted)' }}>
-                    44°12'N 71°18'W
+                    44°12'N 71°18'W · WHITE MOUNTAINS, NH
                   </span>
                 </div>
 
@@ -152,7 +143,7 @@ export default function HomePage() {
                 >
                   <Image
                     src="/images/autumn_trail_hero.jpg"
-                    alt="A quiet misty autumn trail with fallen leaves and rustic wooden marker"
+                    alt="A quiet misty mountain trail with fallen leaves and rustic wooden marker"
                     fill
                     sizes="(max-width: 768px) 100vw, 550px"
                     style={{ objectFit: 'cover' }}
@@ -194,8 +185,8 @@ export default function HomePage() {
                     color: 'var(--ink-soft)',
                   }}
                 >
-                  <span>Larch Creek Trailway · Fallen Birch & Oak Foliage</span>
-                  <span className="field-label">OBSERVATION NOTE</span>
+                  <span>White Mountains Trailway · Birch &amp; Hemlock (Sample Illustration)</span>
+                  <span className="field-label">SAMPLE NOTE</span>
                 </div>
               </div>
 

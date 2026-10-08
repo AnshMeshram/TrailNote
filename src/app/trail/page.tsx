@@ -16,6 +16,7 @@ import { OfflineNotice } from '@/components/ui/OfflineNotice';
 import { PaperTrailMap } from '@/components/map/PaperTrailMap';
 import { getActiveTrail, saveActiveTrail } from '@/lib/storage/offline-store';
 import { TrailPlan, TrailCardData } from '@/types/trail';
+import { getSeason } from '@/lib/season';
 
 export default function TrailResultPage() {
   const router = useRouter();
@@ -41,9 +42,11 @@ export default function TrailResultPage() {
     }
   }, []);
 
+  const seasonInfo = getSeason(new Date(), trailPlan?.waypoints?.[0]?.coordinate?.lat || 21.16);
+
   const plan = trailPlan || {
     id: 'specimen-01',
-    name: 'Autumn Loop · Seminary Hills',
+    name: `${seasonInfo.label} · Seminary Hills`,
     location: 'Seminary Hills Reserve, Nagpur, Maharashtra, India',
     region: 'Nagpur',
     coordinatesSummary: "21°09'N 79°03'E",
