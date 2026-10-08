@@ -386,14 +386,14 @@ a {
   font-weight: 500;
 }
 
-/* Subtle Marker Dot */
+/* Subtle Marker Dot (No glow/blur) */
 .neon-dot {
   width: 7px;
   height: 7px;
   background-color: var(--neon-accent);
   border-radius: 50%;
   display: inline-block;
-  box-shadow: 0 0 0 2px rgba(58, 103, 4, 0.4);
+  border: 1px solid var(--green-leaf);
 }
 
 /* Animated Trail Dash Effect */
@@ -561,11 +561,12 @@ a {
 
 .ai-health-badge.ready .ai-health-dot {
   background-color: var(--neon-accent);
-  box-shadow: 0 0 6px rgba(164, 214, 82, 0.6);
+  border: 1px solid var(--green-leaf);
 }
 
 .ai-health-badge.fallback .ai-health-dot {
   background-color: var(--autumn-rust);
+  border: 1px solid #795548;
 }
 
 .nav-settings-btn {
@@ -689,6 +690,36 @@ a {
     display: block !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+  }
+}
+
+/* Accessibility & Focus Indicators */
+:focus-visible {
+  outline: 2px solid var(--green-leaf);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile Touch Target Standards (44px min for interactive controls) */
+@media (max-width: 768px) {
+  button,
+  .btn-primary,
+  .btn-secondary,
+  .field-input,
+  .field-select,
+  .field-checkbox-pill,
+  .nav-link,
+  .nav-settings-btn {
+    min-height: 44px;
   }
 }
 

@@ -80,24 +80,30 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 3: Open-Source Ecology */}
+          {/* Col 3: Open-Source Ecology & Attribution */}
           <div>
-            <div className="field-label" style={{ marginBottom: '1rem' }}>OPEN-SOURCE ECOLOGY</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+            <div className="field-label" style={{ marginBottom: '1rem' }}>ATTRIBUTION & ECOLOGY</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
               <div>
-                <strong>Gemma 2:</strong> Runs locally on your machine via Ollama
+                <strong>OpenStreetMap contributors:</strong> Cartography &amp; geographic data
               </div>
               <div>
-                <strong>OpenStreetMap:</strong> Cartography (&copy; OpenStreetMap contributors)
+                <strong>Nominatim:</strong> Geocoding &amp; place search
               </div>
               <div>
-                <strong>Nominatim:</strong> Place search &amp; geocoding
+                <strong>OSRM:</strong> Footpath routing &amp; distance engine
               </div>
               <div>
-                <strong>OSRM:</strong> Route geometry &amp; footpath distances
+                <strong>Open-Meteo:</strong> Atmospheric forecasts &amp; sunset data
               </div>
               <div>
-                <strong>Open-Meteo:</strong> Live atmospheric forecasts
+                <strong>Leaflet:</strong> Slippy map cartographic renderer
+              </div>
+              <div>
+                <strong>Ollama:</strong> Local model execution runtime
+              </div>
+              <div>
+                <strong>Gemma 2:</strong> Open-weights naturalist interpretation
               </div>
             </div>
           </div>

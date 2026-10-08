@@ -501,7 +501,15 @@ export default function PlanPage() {
                   {searchResults.map((item, idx) => (
                     <div
                       key={idx}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => handleSelectSearchResult(item)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          handleSelectSearchResult(item);
+                        }
+                      }}
                       style={{
                         padding: '0.75rem 1rem',
                         borderBottom: idx === searchResults.length - 1 ? 'none' : '1px solid var(--paper-border)',
@@ -551,7 +559,7 @@ export default function PlanPage() {
             </div>
 
             {locationStatusMessage && (
-              <div style={{ marginTop: '0.75rem', padding: '0.5rem 0.75rem', backgroundColor: 'var(--paper-warm)', border: '1px solid var(--paper-border-dark)', borderRadius: '2px', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
+              <div role="status" aria-live="polite" style={{ marginTop: '0.75rem', padding: '0.5rem 0.75rem', backgroundColor: 'var(--paper-warm)', border: '1px solid var(--paper-border-dark)', borderRadius: '2px', fontSize: '0.82rem', color: 'var(--ink-soft)' }}>
                 {locationStatusMessage}
               </div>
             )}
@@ -891,7 +899,7 @@ export default function PlanPage() {
             }}
           >
             {isSubmitting ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span role="status" aria-live="polite" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                 <LeafDecoration size={16} color="#FAF7F0" variant="fern" />
                 <span>{loadingMessage}</span>
               </span>

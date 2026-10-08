@@ -29,13 +29,11 @@ export function Navigation() {
     setIsMobileMenuOpen(false);
   }, [pathname]);
 
-  // Primary desktop navigation links
+  // Primary desktop navigation links (folded Trail Card and Field Notes into flow)
   const desktopLinks = [
     { href: '/', label: 'Overview' },
     { href: '/trail', label: 'Trail Guide' },
-    { href: '/trail-card', label: 'Trail Card' },
-    { href: '/walk', label: 'Walk Mode' },
-    { href: '/field-notes', label: 'Field Notes' },
+    { href: '/walk', label: 'Walk' },
     { href: '/journal', label: 'Journal' },
   ];
 
