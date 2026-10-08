@@ -656,12 +656,14 @@ a {
 @media print {
   @page {
     size: A4 portrait;
-    margin: 1.2cm;
+    margin: 1cm;
   }
   body {
     background: #FFFFFF !important;
     color: #10140D !important;
-    font-size: 11pt !important;
+    font-size: 10pt !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   .no-print, nav, footer, header {
     display: none !important;
@@ -678,9 +680,15 @@ a {
     border: 2px solid #243A18 !important;
     box-shadow: none !important;
     margin: 0 !important;
-    padding: 1.5rem !important;
+    padding: 1.25rem !important;
     background: #FAF7F0 !important;
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  .fold-guide {
+    display: block !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 

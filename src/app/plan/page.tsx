@@ -88,38 +88,39 @@ export default function PlanPage() {
     }
   }, []);
 
-  // Debounced search query handler
-  const handleLocationChange = (val: string) => {
+  // Explicit location input handler (no per-keystroke API requests)
+  const handleLocationInputChange = (val: string) => {
     setLocation(val);
     setTrailLocation(null);
-
-    if (searchDebounceRef.current) {
-      clearTimeout(searchDebounceRef.current);
-    }
-
-    if (val.trim().length < 2) {
+    if (val.trim().length === 0) {
       setSearchResults([]);
       setShowDropdown(false);
-      return;
     }
+  };
 
+  const handleSearchLocationExplicit = async () => {
+    if (location.trim().length < 2) return;
     setIsSearching(true);
-    searchDebounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/search-location?q=${encodeURIComponent(val.trim())}&limit=5`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && Array.isArray(data.results)) {
-            setSearchResults(data.results);
-            setShowDropdown(data.results.length > 0);
+    setShowDropdown(false);
+    try {
+      const res = await fetch(`/api/search-location?q=${encodeURIComponent(location.trim())}&limit=5`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.results)) {
+          setSearchResults(data.results);
+          setShowDropdown(data.results.length > 0);
+          if (data.results.length === 0) {
+            setLocationStatusMessage('No matching places found. Try a broader city or landmark.');
+          } else {
+            setLocationStatusMessage(null);
           }
         }
-      } catch {
-        // Fallback
-      } finally {
-        setIsSearching(false);
       }
-    }, 350);
+    } catch {
+      setLocationStatusMessage('Location search temporarily unavailable. Using manual place name.');
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSelectSearchResult = (item: TrailnoteNormalizedLocation) => {
@@ -408,30 +409,52 @@ export default function PlanPage() {
             </p>
 
             <div style={{ position: 'relative' }}>
-              <input
-                id="location-input"
-                type="text"
-                required
-                className="field-input"
-                value={location}
-                onChange={(e) => handleLocationChange(e.target.value)}
-                onFocus={() => {
-                  if (searchResults.length > 0) setShowDropdown(true);
-                }}
-                placeholder="e.g. Seminary Hills, Nagpur or Forest Park, Portland"
-                style={{ paddingLeft: '2.5rem', paddingRight: isSearching ? '2.5rem' : '1rem' }}
-                autoComplete="off"
-              />
-              <MapPin
-                size={18}
-                color="#3A6704"
-                style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}
-              />
-              {isSearching && (
-                <div style={{ position: 'absolute', right: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}>
-                  <LeafDecoration size={14} color="#709F2D" variant="fern" />
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'stretch' }}>
+                <div style={{ position: 'relative', flex: 1 }}>
+                  <input
+                    id="location-input"
+                    type="text"
+                    required
+                    className="field-input"
+                    value={location}
+                    onChange={(e) => handleLocationInputChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleSearchLocationExplicit();
+                      }
+                    }}
+                    placeholder="e.g. Seminary Hills, Nagpur or Forest Park, Portland"
+                    style={{ paddingLeft: '2.5rem', minHeight: '48px', width: '100%' }}
+                    autoComplete="off"
+                  />
+                  <MapPin
+                    size={18}
+                    color="#3A6704"
+                    style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)' }}
+                  />
                 </div>
-              )}
+
+                <button
+                  type="button"
+                  onClick={handleSearchLocationExplicit}
+                  disabled={isSearching || location.trim().length < 2}
+                  className="btn-primary"
+                  style={{
+                    padding: '0 1.25rem',
+                    fontSize: '0.85rem',
+                    whiteSpace: 'nowrap',
+                    minHeight: '48px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    opacity: isSearching || location.trim().length < 2 ? 0.6 : 1,
+                  }}
+                >
+                  <Search size={15} />
+                  <span>{isSearching ? 'Searching...' : 'Search Place'}</span>
+                </button>
+              </div>
 
               {/* Autocomplete Suggestions Dropdown */}
               {showDropdown && searchResults.length > 0 && (

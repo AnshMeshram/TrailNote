@@ -21,6 +21,8 @@ export interface WeatherCondition {
   precipitationPercent: number;
   uvIndex?: number;
   summary: string;
+  sunrise?: string;
+  sunset?: string;
 }
 
 export interface ObservationPromptItem {

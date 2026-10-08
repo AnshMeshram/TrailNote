@@ -31,6 +31,7 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Wea
     url.searchParams.set('longitude', lng.toFixed(4));
     url.searchParams.set('current', 'temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m,precipitation');
     url.searchParams.set('hourly', 'precipitation_probability');
+    url.searchParams.set('daily', 'sunrise,sunset');
     url.searchParams.set('timezone', 'auto');
     url.searchParams.set('forecast_days', '1');
 
@@ -49,6 +50,10 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Wea
         hourly?: {
           precipitation_probability?: number[];
         };
+        daily?: {
+          sunrise?: string[];
+          sunset?: string[];
+        };
       };
 
       if (data.current) {
@@ -62,12 +67,26 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Wea
           data.hourly?.precipitation_probability?.[0] ??
           (data.current.precipitation > 0 ? 70 : 10);
 
+        const formatSunTime = (raw?: string) => {
+          if (!raw) return undefined;
+          if (raw.includes('T')) {
+            const timePart = raw.split('T')[1];
+            return timePart.substring(0, 5); // "HH:MM"
+          }
+          return raw;
+        };
+
+        const sunriseTime = formatSunTime(data.daily?.sunrise?.[0]);
+        const sunsetTime = formatSunTime(data.daily?.sunset?.[0]);
+
         return {
           tempC: Math.round(data.current.temperature_2m),
           condition: wmo.condition,
           windKmh: Math.round(data.current.wind_speed_10m),
           precipitationPercent: Math.round(precipProb),
           summary: wmo.summary,
+          sunrise: sunriseTime || '06:15',
+          sunset: sunsetTime || '18:05',
         };
       }
     }
@@ -82,5 +101,7 @@ export async function fetchCurrentWeather(lat: number, lng: number): Promise<Wea
     windKmh: 9,
     precipitationPercent: 8,
     summary: 'Cool morning breeze with crisp trail visibility',
+    sunrise: '06:15',
+    sunset: '18:05',
   };
 }

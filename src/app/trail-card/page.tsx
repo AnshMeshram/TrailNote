@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Printer, Download, ArrowLeft, Check, Compass, Eye, ShieldCheck, MapPin, Feather, FileText } from 'lucide-react';
+import { Printer, Download, ArrowLeft, Check, Compass, Eye, ShieldCheck, MapPin, Feather, FileText, FileDown, Scissors } from 'lucide-react';
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { CompassMark } from '@/components/ui/CompassMark';
 import { DifficultyBadge } from '@/components/ui/DifficultyBadge';
@@ -14,12 +14,14 @@ import { ObservationPrompt } from '@/components/ui/ObservationPrompt';
 import { getActiveTrail, getScreenTimeLedger, formatLedgerSummary } from '@/lib/storage/offline-store';
 import { TrailPlan, TrailCardData } from '@/types/trail';
 import { getSeason } from '@/lib/season';
+import { calculateSunsetDeadline } from '@/lib/weather/sunset';
 
 export default function TrailCardPage() {
   const [activePlan, setActivePlan] = useState<TrailPlan | null>(null);
   const [activeCard, setActiveCard] = useState<TrailCardData | null>(null);
   const [isSavedOffline, setIsSavedOffline] = useState(true);
   const [ledgerText, setLedgerText] = useState<string>('');
+  const [printLayout, setPrintLayout] = useState<'a4' | 'pocket'>('a4');
 
   useEffect(() => {
     const saved = getActiveTrail();
@@ -52,6 +54,8 @@ export default function TrailCardPage() {
       windKmh: 11,
       precipitationPercent: 5,
       summary: 'Crisp morning air with gentle northwest breeze.',
+      sunrise: '06:15',
+      sunset: '18:05',
     },
     startPoint: 'Eastern Botanical Gate (Stone Marker #1)',
     endPoint: 'Lookout Pavilion & Basalt Ridge',
@@ -101,6 +105,13 @@ export default function TrailCardPage() {
   const mins = specimen.durationMinutes % 60;
   const durationFormatted = hours > 0 ? `${hours}h ${mins > 0 ? `${mins}m` : ''}` : `${mins}m`;
 
+  const sunsetDeadline = calculateSunsetDeadline(
+    specimen.weather?.sunset,
+    specimen.durationMinutes,
+    30,
+    specimen.weather?.sunrise
+  );
+
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
       window.print();
@@ -115,6 +126,7 @@ LOCATION: ${specimen.location}
 DISTANCE: ${specimen.distanceKm} KM · DURATION: ${durationFormatted}
 DIFFICULTY: ${specimen.difficulty.toUpperCase()}
 CONDITIONS: ${specimen.weather.tempC}°C · ${specimen.weather.condition}
+SUNSET DEADLINE: Be back by ${sunsetDeadline.beBackByTime} (Sunset: ${sunsetDeadline.sunsetTime})
 
 BRING (PACK IT / TAKE IT):
 ${specimen.preparation.map((p) => `- [ ] ${p}`).join('\n')}
@@ -155,40 +167,95 @@ PHILOSOPHY:
           gap: '1rem',
         }}
       >
-        <Link href="/trail" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', color: 'var(--ink-soft)' }}>
+        <Link href="/trail" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.9rem', color: 'var(--ink-soft)', minHeight: '48px' }}>
           <ArrowLeft size={16} />
           <span>Trail Guide</span>
         </Link>
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', alignItems: 'center' }}>
+          {/* Print Layout Selector */}
+          <div style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: 'var(--paper-warm)', border: '1px solid var(--paper-border-dark)', borderRadius: '3px', padding: '2px' }}>
+            <button
+              type="button"
+              onClick={() => setPrintLayout('a4')}
+              style={{
+                padding: '0.45rem 0.75rem',
+                fontSize: '0.78rem',
+                fontFamily: 'var(--font-mono)',
+                border: 'none',
+                borderRadius: '2px',
+                cursor: 'pointer',
+                backgroundColor: printLayout === 'a4' ? 'var(--paper-card)' : 'transparent',
+                fontWeight: printLayout === 'a4' ? 700 : 400,
+                color: 'var(--ink-primary)',
+                minHeight: '44px',
+              }}
+            >
+              A4 Full
+            </button>
+            <button
+              type="button"
+              onClick={() => setPrintLayout('pocket')}
+              style={{
+                padding: '0.45rem 0.75rem',
+                fontSize: '0.78rem',
+                fontFamily: 'var(--font-mono)',
+                border: 'none',
+                borderRadius: '2px',
+                cursor: 'pointer',
+                backgroundColor: printLayout === 'pocket' ? 'var(--paper-card)' : 'transparent',
+                fontWeight: printLayout === 'pocket' ? 700 : 400,
+                color: 'var(--ink-primary)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                minHeight: '44px',
+              }}
+            >
+              <Scissors size={12} />
+              <span>Pocket Fold</span>
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={handleDownloadText}
             className="btn-secondary"
-            style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}
-            title="Download formatted plain-text note"
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+            title="Download plain text note"
           >
-            <Download size={15} />
-            <span>Download Field Note (.txt)</span>
+            <Download size={14} />
+            <span>Note (.txt)</span>
           </button>
 
           <button
             type="button"
             onClick={handlePrint}
             className="btn-secondary"
-            style={{ padding: '0.6rem 1.1rem', fontSize: '0.85rem' }}
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+            title="Download PDF via browser print"
           >
-            <Printer size={15} />
-            <span>Print Field Card (A4)</span>
+            <FileDown size={14} />
+            <span>Download PDF</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handlePrint}
+            className="btn-secondary"
+            style={{ padding: '0.55rem 0.9rem', fontSize: '0.82rem', minHeight: '48px' }}
+          >
+            <Printer size={14} />
+            <span>Print {printLayout === 'pocket' ? 'Pocket' : 'A4'}</span>
           </button>
 
           <Link
             href="/walk"
             className="btn-primary"
-            style={{ padding: '0.6rem 1.25rem', fontSize: '0.85rem' }}
+            style={{ padding: '0.55rem 1.15rem', fontSize: '0.82rem', minHeight: '48px' }}
           >
-            <Compass size={15} />
-            <span>Start Walk (Quiet Mode)</span>
+            <Compass size={14} />
+            <span>Start Walk</span>
           </Link>
         </div>
       </div>
@@ -261,11 +328,11 @@ PHILOSOPHY:
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
             gap: '1rem',
             padding: '1rem 0',
             borderBottom: '1px dashed var(--paper-border-dark)',
-            marginBottom: '1.75rem',
+            marginBottom: '1.25rem',
           }}
         >
           <div>
@@ -287,12 +354,66 @@ PHILOSOPHY:
             </div>
           </div>
           <div>
-            <div className="field-label">ROUTE PATTERN</div>
-            <div style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', paddingTop: '0.2rem' }}>
-              Circular Footpath Loop
+            <div className="field-label" style={{ color: sunsetDeadline.willEndAfterDark ? 'var(--terracotta)' : 'inherit' }}>
+              BE BACK BY
+            </div>
+            <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.6rem', fontWeight: 600, color: sunsetDeadline.willEndAfterDark ? 'var(--terracotta)' : 'inherit' }}>
+              {sunsetDeadline.beBackByTime}
+            </div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--ink-muted)', fontFamily: 'var(--font-mono)' }}>
+              SUNSET: {sunsetDeadline.sunsetTime}
             </div>
           </div>
         </div>
+
+        {/* Daylight Safety Warning */}
+        {sunsetDeadline.warning && (
+          <div
+            style={{
+              padding: '0.65rem 0.85rem',
+              backgroundColor: 'rgba(166, 75, 42, 0.08)',
+              border: '1px solid var(--terracotta)',
+              borderRadius: '2px',
+              fontSize: '0.78rem',
+              color: 'var(--terracotta)',
+              fontWeight: 600,
+              marginBottom: '1.25rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+            }}
+          >
+            <span>⚠️ {sunsetDeadline.warning}</span>
+          </div>
+        )}
+
+        {/* Pocket Fold Guide Line (Horizontal Crease) */}
+        {printLayout === 'pocket' && (
+          <div
+            className="fold-guide"
+            style={{
+              margin: '1.25rem 0',
+              borderTop: '2px dashed var(--terracotta)',
+              textAlign: 'center',
+              position: 'relative',
+            }}
+          >
+            <span
+              style={{
+                position: 'relative',
+                top: '-0.7em',
+                backgroundColor: 'var(--paper-card)',
+                padding: '0 0.6rem',
+                fontSize: '0.68rem',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--terracotta)',
+                fontWeight: 600,
+              }}
+            >
+              ✂ HORIZONTAL FOLD LINE // CREASE IN HALF (POCKET FOLD) ✂
+            </span>
+          </div>
+        )}
 
         {/* Trail Elevation Profile */}
         <div style={{ marginBottom: '2rem' }}>
@@ -454,6 +575,34 @@ PHILOSOPHY:
             </svg>
           </div>
         </div>
+
+        {/* Pocket Fold Guide Line (Vertical Crease) */}
+        {printLayout === 'pocket' && (
+          <div
+            className="fold-guide"
+            style={{
+              margin: '1.5rem 0',
+              borderTop: '2px dashed var(--terracotta)',
+              textAlign: 'center',
+              position: 'relative',
+            }}
+          >
+            <span
+              style={{
+                position: 'relative',
+                top: '-0.7em',
+                backgroundColor: 'var(--paper-card)',
+                padding: '0 0.6rem',
+                fontSize: '0.68rem',
+                fontFamily: 'var(--font-mono)',
+                color: 'var(--terracotta)',
+                fontWeight: 600,
+              }}
+            >
+              ✂ VERTICAL FOLD LINE // CREASE INTO QUARTER POCKET SIZE ✂
+            </span>
+          </div>
+        )}
 
         {/* RULED NOTE SECTION FOR PHYSICAL FIELD PENCIL JOTTINGS */}
         <div

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Compass, Check, ArrowRight, Printer, MapPin, Feather, Sparkles, RefreshCw, Share2 } from 'lucide-react';
+import { Compass, Check, ArrowRight, Printer, MapPin, Feather, Sparkles, RefreshCw, Share2, Sunset, AlertTriangle } from 'lucide-react';
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { TrailHeader } from '@/components/ui/TrailHeader';
 import { DistanceBlock } from '@/components/ui/DistanceBlock';
@@ -17,6 +17,7 @@ import { PaperTrailMap } from '@/components/map/PaperTrailMap';
 import { getActiveTrail, saveActiveTrail } from '@/lib/storage/offline-store';
 import { TrailPlan, TrailCardData } from '@/types/trail';
 import { getSeason } from '@/lib/season';
+import { calculateSunsetDeadline } from '@/lib/weather/sunset';
 
 export default function TrailResultPage() {
   const router = useRouter();
@@ -221,12 +222,59 @@ export default function TrailResultPage() {
       </div>
 
       {/* 4. CURRENT CONDITIONS */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
         <WeatherStrip
           weather={plan.weather}
           advice="Atmospheric readings verified via Open-Meteo. Layer appropriately for ridge breezes."
         />
       </div>
+
+      {/* 4b. SUNSET DEADLINE & DAYLIGHT SAFETY */}
+      {(() => {
+        const sunsetDeadline = calculateSunsetDeadline(
+          plan.weather?.sunset,
+          plan.durationMinutes,
+          30,
+          plan.weather?.sunrise
+        );
+        return (
+          <div
+            className="paper-card"
+            style={{
+              padding: '1.25rem 1.5rem',
+              border: '1px solid',
+              borderColor: sunsetDeadline.willEndAfterDark ? 'var(--terracotta)' : 'var(--paper-border-dark)',
+              backgroundColor: sunsetDeadline.willEndAfterDark ? 'rgba(166, 75, 42, 0.08)' : 'var(--paper-warm)',
+              borderRadius: '3px',
+              marginBottom: '2rem',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <Sunset size={20} color={sunsetDeadline.willEndAfterDark ? '#A64B2A' : '#3A6704'} />
+                <div>
+                  <div className="field-label" style={{ color: sunsetDeadline.willEndAfterDark ? 'var(--terracotta)' : 'var(--green-deep)' }}>
+                    DAYLIGHT SAFETY // SUNSET DEADLINE
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-serif)', fontSize: '1.15rem', fontWeight: 600 }}>
+                    Be back by <span style={{ textDecoration: 'underline' }}>{sunsetDeadline.beBackByTime}</span>
+                    <span style={{ fontSize: '0.82rem', fontFamily: 'var(--font-mono)', fontWeight: 400, color: 'var(--ink-soft)', marginLeft: '0.5rem' }}>
+                      (Sunset: {sunsetDeadline.sunsetTime} · 30m safety buffer)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {sunsetDeadline.warning && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--terracotta)', fontSize: '0.82rem', fontWeight: 600 }}>
+                  <AlertTriangle size={15} />
+                  <span>{sunsetDeadline.warning}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 5. TRAIL BRIEFING */}
       <div
