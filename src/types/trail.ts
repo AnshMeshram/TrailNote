@@ -142,3 +142,22 @@ export interface FieldJournalEntry {
   shapedNote?: string;
   shapedSource?: 'gemma2' | 'naturalist-fallback';
 }
+
+export interface FieldTestRecord {
+  id: string;
+  date: string;
+  place: string;
+  weather: string;
+  whatWorked: string;
+  whatFailed: string;
+  photoUrl?: string;
+  oneSurprise: string;
+  checklistPassed: {
+    cardPrinted: boolean;
+    presavedOffline: boolean;
+    airplaneModeTested: boolean;
+    pencilPacked: boolean;
+  };
+  notes?: string;
+  updatedAt: string;
+}

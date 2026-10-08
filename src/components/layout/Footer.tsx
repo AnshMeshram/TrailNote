@@ -72,6 +72,11 @@ export function Footer() {
                   → Personal Outdoor Journal
                 </Link>
               </li>
+              <li>
+                <Link href="/field-test" style={{ fontSize: '0.9rem', color: 'var(--ink-soft)' }} className="hover-underline">
+                  → Real Field Test Protocol
+                </Link>
+              </li>
             </ul>
           </div>
 

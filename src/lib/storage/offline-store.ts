@@ -1,4 +1,4 @@
-import { TrailPlan, TrailCardData, FieldJournalEntry, DifficultyLevel, WeatherTolerance, DeviceLocation, TrailLocation } from '@/types/trail';
+import { TrailPlan, TrailCardData, FieldJournalEntry, DifficultyLevel, WeatherTolerance, DeviceLocation, TrailLocation, FieldTestRecord } from '@/types/trail';
 
 export interface UserSettings {
   walkingPaceKmh: number;
@@ -270,4 +270,51 @@ export function formatLedgerSummary(plannedSec: number, walkSec: number): string
   const walkStr = wHours > 0 ? `${wHours}h ${wMin}m` : `${wMin}m`;
 
   return `Planned in ${plannedStr}. Outside for ${walkStr}.`;
+}
+
+// ========================================================
+// REAL FIELD TEST RECORD (LOCAL ONLY)
+// ========================================================
+const FIELD_TEST_KEY = 'trailnote_field_test_record';
+
+export function getDefaultFieldTestRecord(): FieldTestRecord {
+  return {
+    id: 'ft-real-walk-1',
+    date: new Date().toISOString().split('T')[0],
+    place: '',
+    weather: '',
+    whatWorked: '',
+    whatFailed: '',
+    photoUrl: undefined,
+    oneSurprise: '',
+    checklistPassed: {
+      cardPrinted: false,
+      presavedOffline: false,
+      airplaneModeTested: false,
+      pencilPacked: false,
+    },
+    notes: '',
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+export function getFieldTestRecord(): FieldTestRecord {
+  if (typeof window === 'undefined') return getDefaultFieldTestRecord();
+  try {
+    const raw = localStorage.getItem(FIELD_TEST_KEY);
+    if (!raw) return getDefaultFieldTestRecord();
+    return JSON.parse(raw);
+  } catch {
+    return getDefaultFieldTestRecord();
+  }
+}
+
+export function saveFieldTestRecord(record: FieldTestRecord): void {
+  if (typeof window === 'undefined') return;
+  try {
+    record.updatedAt = new Date().toISOString();
+    localStorage.setItem(FIELD_TEST_KEY, JSON.stringify(record));
+  } catch (err) {
+    console.error('Failed to save field test record:', err);
+  }
 }

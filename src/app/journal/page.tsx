@@ -148,10 +148,15 @@ export default function JournalPage() {
           </p>
         </div>
 
-        <Link href="/plan" className="btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
-          <Compass size={15} />
-          <span>Plan New Walk</span>
-        </Link>
+        <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+          <Link href="/field-test" className="btn-secondary" style={{ padding: '0.65rem 1rem', fontSize: '0.85rem' }}>
+            <span>Field Test Protocol</span>
+          </Link>
+          <Link href="/plan" className="btn-primary" style={{ padding: '0.65rem 1.25rem', fontSize: '0.88rem' }}>
+            <Compass size={15} />
+            <span>Plan New Walk</span>
+          </Link>
+        </div>
       </div>
 
       {/* Empty State Check */}
