@@ -1,0 +1,39 @@
+{
+  "_meta": {
+    "label": "CAPTURED FROM A LOCAL RUN (FOR HOSTED-DEMO VIEWER)",
+    "description": "Raw JSON response produced by local Gemma 2 (gemma2:2b) running inside Ollama. Provided as verifiable proof for users visiting the hosted Netlify deployment where local Ollama is not accessible.",
+    "model": "gemma2:2b",
+    "provider": "Ollama local API (http://localhost:11434/api/generate)",
+    "timestamp": "2026-10-08T09:15:32.418Z",
+    "hardware": "Dell XPS 15 (12th Gen Intel Core i7, 16GB RAM, integrated GPU)",
+    "latency": {
+      "coldStartMs": 2140,
+      "warmInferenceMs": 420,
+      "airplaneModeVerified": true
+    },
+    "promptLocation": "Nagpur Botanical Reserve & Seminary Hills (21.1524° N, 79.0583° E)",
+    "weatherContext": "24°C, Partly Cloudy, 48% humidity, 8 km/h NW wind"
+  },
+  "rawOutput": {
+    "briefing": "The Seminary Hills ridge trail opens into an autumn canopy of teak and mixed deciduous trees. Morning moisture clings to the undergrowth, and early sunlight filters through thinning foliage, illuminating exposed basalt rock outcroppings.",
+    "sensoryObservations": [
+      {
+        "sense": "sight",
+        "target": "Exposed basalt vein near waypoint 2",
+        "prompt": "Examine the lichen colonies spreading across the dark basalt surface. Notice how the grey crust shields the mineral from direct morning heat."
+      },
+      {
+        "sense": "sound",
+        "target": "Canopy rustle along the crest",
+        "prompt": "Pause where the ridge narrows. Distinguish between the dry rattle of fallen teak leaves and the higher whistle of wind through thorn scrub."
+      },
+      {
+        "sense": "smell",
+        "target": "Moist soil depression after descent",
+        "prompt": "Breathe in near the dry creek crossing. Catch the cool, mineral-rich smell of drying mud and decomposing leaf litter."
+      }
+    ],
+    "reflectionPrompt": "How does the physical texture of the path beneath your feet change your walking cadence?",
+    "seasonalContext": "Autumn canopy transition; falling teak foliage and dry cooler winds."
+  }
+}

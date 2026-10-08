@@ -51,12 +51,14 @@ export async function POST(req: NextRequest) {
     );
 
     // 4. Generate naturalist briefing & observation prompts via Gemma 2 (with deterministic fallback)
+    const selectedModel = typeof body.selectedModel === 'string' ? body.selectedModel : undefined;
     const aiResult = await generateTrailGuide(
       preferences,
       geocoded.displayName,
       weather,
       routeData.distanceKm,
-      routeData.durationMinutes
+      routeData.durationMinutes,
+      selectedModel
     );
 
     const planId = `tn-${Date.now().toString(36)}`;

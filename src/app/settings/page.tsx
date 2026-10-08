@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Settings, Shield, Cpu, RefreshCw, Check, ArrowLeft, Wifi, HardDrive } from 'lucide-react';
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
@@ -20,19 +20,24 @@ export default function SettingsPage() {
   } | null>(null);
   const [isCheckingOllama, setIsCheckingOllama] = useState(false);
 
-  const fetchOllamaHealth = async () => {
+  const [customModelText, setCustomModelText] = useState(settings.selectedModel || 'gemma2:2b');
+
+  const fetchOllamaHealth = useCallback(async (modelOverride?: string) => {
     setIsCheckingOllama(true);
+    const modelToTest = modelOverride || settings.selectedModel || 'gemma2:2b';
     try {
-      const res = await fetch('/api/health');
+      const res = await fetch(`/api/health?model=${encodeURIComponent(modelToTest)}`);
       if (res.ok) {
         const data = await res.json();
         setOllamaStatus(data);
+      } else {
+        throw new Error('Health check error');
       }
     } catch {
       setOllamaStatus({
         status: 'fallback-ready',
         isAvailable: false,
-        model: 'gemma2',
+        model: modelToTest,
         baseUrl: 'http://localhost:11434',
         availableModels: [],
         checkedAt: new Date().toISOString(),
@@ -40,12 +45,14 @@ export default function SettingsPage() {
     } finally {
       setIsCheckingOllama(false);
     }
-  };
+  }, [settings.selectedModel]);
 
   useEffect(() => {
-    setSettings(loadSettings());
-    fetchOllamaHealth();
-  }, []);
+    const s = loadSettings();
+    setSettings(s);
+    setCustomModelText(s.selectedModel || 'gemma2:2b');
+    fetchOllamaHealth(s.selectedModel);
+  }, [fetchOllamaHealth]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +82,7 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p style={{ margin: 0, color: 'var(--ink-soft)' }}>
-          Configure your personal walking pace, measurement units, and local Ollama inference connection.
+          Configure your personal walking pace, measurement units, and local Ollama inference model.
         </p>
       </div>
 
@@ -90,20 +97,21 @@ export default function SettingsPage() {
 
             <button
               type="button"
-              onClick={fetchOllamaHealth}
+              onClick={() => fetchOllamaHealth(settings.selectedModel)}
               disabled={isCheckingOllama}
               className="btn-secondary"
-              style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+              style={{ padding: '0.4rem 0.85rem', fontSize: '0.82rem', fontWeight: 600 }}
+              title="Test connection to local Ollama server"
             >
-              <RefreshCw size={12} className={isCheckingOllama ? 'spin' : ''} />
-              <span>{isCheckingOllama ? 'Pinging Ollama...' : 'Test Connection'}</span>
+              <RefreshCw size={13} className={isCheckingOllama ? 'spin' : ''} />
+              <span>{isCheckingOllama ? 'Testing Ollama...' : 'Test Ollama'}</span>
             </button>
           </div>
 
           {/* Connection Status Badge */}
           <div
             style={{
-              padding: '1rem',
+              padding: '1.15rem',
               backgroundColor: ollamaStatus?.isAvailable ? 'rgba(58, 103, 4, 0.08)' : 'var(--paper-warm)',
               border: '1px solid',
               borderColor: ollamaStatus?.isAvailable ? 'var(--green-leaf)' : 'var(--paper-border-dark)',
@@ -116,56 +124,112 @@ export default function SettingsPage() {
               gap: '0.75rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
               <span
                 style={{
-                  width: '10px',
-                  height: '10px',
+                  width: '11px',
+                  height: '11px',
                   borderRadius: '50%',
                   backgroundColor: ollamaStatus?.isAvailable ? 'var(--neon-accent)' : 'var(--autumn-rust)',
                   border: `1.5px solid ${ollamaStatus?.isAvailable ? 'var(--green-leaf)' : '#795548'}`,
+                  flexShrink: 0,
                 }}
               />
               <div>
-                <strong style={{ fontSize: '0.92rem' }}>
+                <strong style={{ fontSize: '0.95rem', display: 'block', marginBottom: '0.2rem' }}>
                   {ollamaStatus?.isAvailable
-                    ? 'LOCAL AI · GEMMA 2 READY'
-                    : 'LOCAL AI · OFFLINE (FIELD FALLBACK READY)'}
+                    ? `Guide: ${settings.selectedModel === 'fallback' ? 'built-in field rules (manual override)' : (ollamaStatus.model || settings.selectedModel) + ' active'}`
+                    : 'Guide: built-in field rules'}
                 </strong>
-                <div style={{ fontSize: '0.8rem', color: 'var(--ink-muted)' }}>
-                  {ollamaStatus?.isAvailable
-                    ? `Connected to ${ollamaStatus.baseUrl} · Model: ${ollamaStatus.model}`
-                    : 'Ollama is currently paused or unreachable. Trailnote will generate guides via deterministic naturalist rules.'}
+                <div style={{ fontSize: '0.82rem', color: 'var(--ink-muted)', lineHeight: 1.45 }}>
+                  {ollamaStatus?.isAvailable ? (
+                    <span>
+                      Connected to <code>{ollamaStatus.baseUrl}</code> · Round-trip response: <strong>{(ollamaStatus as any).latencyMs ?? 0} ms</strong>
+                    </span>
+                  ) : (
+                    <span>
+                      This hosted demo or disconnected session uses built-in field-guide rules. Gemma 2 runs on your own machine.
+                      Run locally with: <code style={{ backgroundColor: 'var(--paper-bg)', padding: '0.1rem 0.35rem', borderRadius: '2px' }}>ollama pull gemma2:2b</code>
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
 
             <span className="field-stamp" style={{ fontSize: '0.7rem' }}>
-              {ollamaStatus?.isAvailable ? 'ZERO CLOUD TELEMETRY' : 'DETERMINISTIC MODE'}
+              {ollamaStatus?.isAvailable ? '0 CLOUD TELEMETRY' : 'DETERMINISTIC FALLBACK'}
             </span>
           </div>
 
-          {/* Model selection */}
-          <div>
-            <label className="field-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
-              PREFERRED LOCAL MODEL
-            </label>
-            <select
-              className="field-select"
-              value={settings.selectedModel}
-              onChange={(e) => setSettings({ ...settings, selectedModel: e.target.value })}
-            >
-              <option value="gemma2">gemma2 (Recommended · Google DeepMind Open Weight)</option>
-              <option value="gemma2:2b">gemma2:2b (Ultra-lightweight · Low Memory)</option>
-              <option value="fallback">Deterministic Rule-based Fallback (No AI execution)</option>
-              {ollamaStatus?.availableModels
-                ?.filter((m) => !m.includes('gemma2'))
-                .map((m) => (
-                  <option key={m} value={m}>
-                    {m} (Installed in Ollama)
-                  </option>
-                ))}
-            </select>
+          {/* Model selection & Custom Typing */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label className="field-label" style={{ display: 'block', marginBottom: '0.4rem' }}>
+                SELECT LOCAL MODEL
+              </label>
+              <select
+                className="field-select"
+                value={
+                  ['gemma2:2b', 'gemma2:9b', 'fallback'].includes(settings.selectedModel)
+                    ? settings.selectedModel
+                    : (ollamaStatus?.availableModels || []).includes(settings.selectedModel)
+                    ? settings.selectedModel
+                    : 'custom'
+                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === 'custom') {
+                    // keep custom text
+                  } else {
+                    setSettings({ ...settings, selectedModel: val });
+                    setCustomModelText(val);
+                  }
+                }}
+              >
+                <option value="gemma2:2b">gemma2:2b (Default · 2B Lightweight · Fast on CPU/Laptop)</option>
+                <option value="gemma2:9b">gemma2:9b (Higher Precision 9B · High RAM/GPU)</option>
+                <option value="fallback">Deterministic Rules (Offline fallback · No AI process)</option>
+                {ollamaStatus?.availableModels
+                  ?.filter((m) => !['gemma2:2b', 'gemma2:9b'].includes(m))
+                  .map((m) => (
+                    <option key={m} value={m}>
+                      {m} (Installed in Ollama)
+                    </option>
+                  ))}
+                <option value="custom">✎ Custom Model (Type model name below...)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="field-label" style={{ display: 'block', marginBottom: '0.35rem' }}>
+                OR TYPE CUSTOM OLLAMA MODEL TAG (E.G. <code>gemma2:9b</code>, <code>mistral</code>, <code>llama3.2:1b</code>)
+              </label>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <input
+                  type="text"
+                  className="field-input"
+                  style={{ flex: 1, fontFamily: 'monospace', fontSize: '0.88rem' }}
+                  value={customModelText}
+                  placeholder="e.g. gemma2:9b, mistral, llama3.2:1b"
+                  onChange={(e) => {
+                    const text = e.target.value;
+                    setCustomModelText(text);
+                    setSettings({ ...settings, selectedModel: text });
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => fetchOllamaHealth(customModelText)}
+                  className="btn-secondary"
+                  style={{ whiteSpace: 'nowrap', padding: '0 0.85rem', fontSize: '0.8rem' }}
+                >
+                  Verify Model
+                </button>
+              </div>
+              <span style={{ fontSize: '0.75rem', color: 'var(--ink-muted)', marginTop: '0.35rem', display: 'block' }}>
+                Active model target: <strong>{settings.selectedModel || 'gemma2:2b'}</strong>. When running locally with Ollama, Trailnote will send prompts to this tag.
+              </span>
+            </div>
           </div>
         </div>
 

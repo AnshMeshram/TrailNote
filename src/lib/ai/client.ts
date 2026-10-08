@@ -5,10 +5,12 @@
 
 export async function callOllama(
   prompt: string,
-  systemPrompt?: string
-): Promise<{ response: string; ok: boolean; error?: string }> {
+  systemPrompt?: string,
+  modelOverride?: string
+): Promise<{ response: string; ok: boolean; error?: string; modelUsed: string; latencyMs: number }> {
   const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-  const model = process.env.OLLAMA_MODEL || 'gemma2';
+  const model = modelOverride || process.env.OLLAMA_MODEL || 'gemma2:2b';
+  const startTime = Date.now();
 
   try {
     const res = await fetch(`${ollamaUrl}/api/generate`, {
@@ -28,29 +30,33 @@ export async function callOllama(
       signal: AbortSignal.timeout(15000), // 15 second timeout for local inference
     });
 
+    const latencyMs = Date.now() - startTime;
+
     if (!res.ok) {
-      return { response: '', ok: false, error: `HTTP ${res.status}: ${res.statusText}` };
+      return { response: '', ok: false, error: `HTTP ${res.status}: ${res.statusText}`, modelUsed: model, latencyMs };
     }
 
     const data = await res.json();
-    return { response: data.response || '', ok: true };
+    return { response: data.response || '', ok: true, modelUsed: model, latencyMs };
   } catch (err: unknown) {
+    const latencyMs = Date.now() - startTime;
     const message = err instanceof Error ? err.message : 'Connection failed';
-    return { response: '', ok: false, error: message };
+    return { response: '', ok: false, error: message, modelUsed: model, latencyMs };
   }
 }
 
 /**
  * Check if Ollama is reachable and query available models.
  */
-export async function checkOllamaStatus(): Promise<{
+export async function checkOllamaStatus(requestedModel?: string): Promise<{
   isAvailable: boolean;
   model: string;
   baseUrl: string;
   availableModels: string[];
+  isModelPresent: boolean;
 }> {
   const baseUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-  const targetModel = process.env.OLLAMA_MODEL || 'gemma2';
+  const targetModel = requestedModel || process.env.OLLAMA_MODEL || 'gemma2:2b';
 
   try {
     const res = await fetch(`${baseUrl}/api/tags`, {
@@ -59,20 +65,23 @@ export async function checkOllamaStatus(): Promise<{
     });
 
     if (!res.ok) {
-      return { isAvailable: false, model: targetModel, baseUrl, availableModels: [] };
+      return { isAvailable: false, model: targetModel, baseUrl, availableModels: [], isModelPresent: false };
     }
 
     const data = (await res.json()) as { models?: { name: string }[] };
     const availableModels = (data.models || []).map((m) => m.name);
-    const isModelPresent = availableModels.some((m) => m.includes(targetModel));
+    const isModelPresent = availableModels.some((m) =>
+      m.toLowerCase().includes(targetModel.toLowerCase()) || targetModel.toLowerCase().includes(m.toLowerCase())
+    );
 
     return {
       isAvailable: true,
       model: isModelPresent ? targetModel : (availableModels[0] || targetModel),
       baseUrl,
       availableModels,
+      isModelPresent,
     };
   } catch {
-    return { isAvailable: false, model: targetModel, baseUrl, availableModels: [] };
+    return { isAvailable: false, model: targetModel, baseUrl, availableModels: [], isModelPresent: false };
   }
 }

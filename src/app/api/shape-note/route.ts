@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
     } = body;
 
     const ollamaUrl = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    const model = process.env.OLLAMA_MODEL || 'gemma2';
+    const selectedModel = typeof body.selectedModel === 'string' ? body.selectedModel : undefined;
+    const model = selectedModel || process.env.OLLAMA_MODEL || 'gemma2';
 
     const systemPrompt = `You are a quiet, attentive naturalist writer in the tradition of Nan Shepherd, John Muir, and Robert Macfarlane.
 Your task is to transform a walker's raw field notes, sights, and sounds into a single cohesive, lyrical paragraph of polished field journal prose.

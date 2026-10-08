@@ -6,7 +6,7 @@ import { Compass, Clock, MapPin, Feather, Check, ArrowRight, Sparkles, AlertCirc
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { DifficultyBadge } from '@/components/ui/DifficultyBadge';
 import { DifficultyLevel, FitnessLevel, WeatherTolerance, TrailPreferences, DeviceLocation, TrailLocation } from '@/types/trail';
-import { saveActiveTrail, saveDeviceLocation, getDeviceLocation, addPlanningSeconds } from '@/lib/storage/offline-store';
+import { saveActiveTrail, saveDeviceLocation, getDeviceLocation, addPlanningSeconds, loadSettings } from '@/lib/storage/offline-store';
 import { getCurrentLocation } from '@/lib/location/geolocation';
 import { TrailnoteNormalizedLocation } from '@/lib/maps/nominatim';
 
@@ -256,10 +256,14 @@ export default function PlanPage() {
     const msgTimer3 = setTimeout(() => setLoadingMessage('Synthesizing sensory observation prompts (Gemma 2)...'), 2600);
 
     try {
+      const activeSettings = loadSettings();
       const res = await fetch('/api/generate-trail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferences),
+        body: JSON.stringify({
+          ...preferences,
+          selectedModel: activeSettings.selectedModel,
+        }),
       });
 
       clearTimeout(msgTimer1);

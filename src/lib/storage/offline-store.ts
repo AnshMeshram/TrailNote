@@ -17,7 +17,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   unit: 'km',
   preferredDifficulty: 'moderate',
   defaultDistanceKm: 4.8,
-  selectedModel: 'gemma2',
+  selectedModel: 'gemma2:2b',
   offlineOnlyMode: false,
   natureInterests: ['Autumn Foliage & Leaf Shapes', 'Bird Songs & Calls', 'Quiet Contemplation'],
   preferredTerrain: ['Dirt Trail', 'Forested Canopy', 'Gentle Ridge'],

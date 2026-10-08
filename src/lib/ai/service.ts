@@ -19,7 +19,8 @@ export async function generateTrailGuide(
   locationName: string,
   weather: WeatherCondition,
   distanceKm: number,
-  durationMinutes: number
+  durationMinutes: number,
+  modelOverride?: string
 ): Promise<TrailGenerationResult> {
   const { prompt, systemPrompt } = buildTrailPrompt(
     preferences,
@@ -29,7 +30,7 @@ export async function generateTrailGuide(
     durationMinutes
   );
 
-  const { response, ok } = await callOllama(prompt, systemPrompt);
+  const { response, ok, modelUsed } = await callOllama(prompt, systemPrompt, modelOverride);
 
   if (ok && response) {
     const parsed = parseAIJson<unknown>(response);
@@ -39,7 +40,7 @@ export async function generateTrailGuide(
         return {
           data: validation.data,
           source: 'ai',
-          modelUsed: process.env.OLLAMA_MODEL || 'gemma2',
+          modelUsed,
         };
       }
     }
