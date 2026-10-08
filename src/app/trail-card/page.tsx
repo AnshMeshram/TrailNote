@@ -11,7 +11,7 @@ import { TrailLine } from '@/components/ui/TrailLine';
 import { WeatherStrip } from '@/components/ui/WeatherStrip';
 import { OutdoorChecklist } from '@/components/ui/OutdoorChecklist';
 import { ObservationPrompt } from '@/components/ui/ObservationPrompt';
-import { getActiveTrail } from '@/lib/storage/offline-store';
+import { getActiveTrail, getScreenTimeLedger, formatLedgerSummary } from '@/lib/storage/offline-store';
 import { TrailPlan, TrailCardData } from '@/types/trail';
 import { getSeason } from '@/lib/season';
 
@@ -19,12 +19,19 @@ export default function TrailCardPage() {
   const [activePlan, setActivePlan] = useState<TrailPlan | null>(null);
   const [activeCard, setActiveCard] = useState<TrailCardData | null>(null);
   const [isSavedOffline, setIsSavedOffline] = useState(true);
+  const [ledgerText, setLedgerText] = useState<string>('');
 
   useEffect(() => {
     const saved = getActiveTrail();
     if (saved && saved.plan && saved.card) {
       setActivePlan(saved.plan);
       setActiveCard(saved.card);
+    }
+    const ledger = getScreenTimeLedger();
+    if (ledger.lastSummary) {
+      setLedgerText(ledger.lastSummary);
+    } else if (ledger.planningDurationSeconds > 0) {
+      setLedgerText(formatLedgerSummary(ledger.planningDurationSeconds, ledger.walkDurationSeconds || 5100));
     }
   }, []);
 
@@ -222,11 +229,16 @@ PHILOSOPHY:
           }}
         >
           <div>
-            <div style={{ marginBottom: '0.5rem' }}>
+            <div style={{ marginBottom: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
               <span className="field-stamp green">
                 <LeafDecoration size={12} color="#3A6704" variant="maple" />
                 TRAILNOTE FIELD CARD // SPECIMEN #2026-TN
               </span>
+              {ledgerText && (
+                <span className="field-stamp" style={{ backgroundColor: '#20251A', color: '#E9E1CC', borderColor: '#20251A' }}>
+                  ⏱ {ledgerText}
+                </span>
+              )}
             </div>
             <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4vw, 2.8rem)', margin: 0, lineHeight: 1.1 }}>
               {specimen.name}
@@ -508,7 +520,7 @@ PHILOSOPHY:
           }}
         >
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--ink-muted)' }}>
-            LOCAL MODEL: GEMMA 2 · OPEN-SOURCE INFRASTRUCTURE · LEAVE NO TRACE
+            GUIDE: {(activePlan?.aiMetadata?.source === 'ai' || activePlan?.aiMetadata?.source === 'gemma2') ? 'GEMMA 2 ACTIVE' : 'BUILT-IN FIELD RULES'} · CARTOGRAPHY: OSRM/OSM · LEAVE NO TRACE
           </div>
 
           <Link

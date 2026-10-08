@@ -173,3 +173,101 @@ export function clearDeviceLocation(): void {
     localStorage.removeItem(DEVICE_LOCATION_KEY);
   } catch {}
 }
+
+// ========================================================
+// SCREEN-TIME LEDGER (LOCAL ONLY)
+// ========================================================
+const LEDGER_KEY = 'trailnote_screentime_ledger';
+
+export interface ScreenTimeLedger {
+  planningDurationSeconds: number;
+  walkStartedAt: number | null;
+  walkCompletedAt: number | null;
+  walkDurationSeconds: number;
+  lastSummary?: string;
+}
+
+export function getScreenTimeLedger(): ScreenTimeLedger {
+  if (typeof window === 'undefined') {
+    return {
+      planningDurationSeconds: 160,
+      walkStartedAt: null,
+      walkCompletedAt: null,
+      walkDurationSeconds: 0,
+    };
+  }
+  try {
+    const raw = localStorage.getItem(LEDGER_KEY);
+    if (!raw) {
+      return {
+        planningDurationSeconds: 0,
+        walkStartedAt: null,
+        walkCompletedAt: null,
+        walkDurationSeconds: 0,
+      };
+    }
+    return JSON.parse(raw);
+  } catch {
+    return {
+      planningDurationSeconds: 0,
+      walkStartedAt: null,
+      walkCompletedAt: null,
+      walkDurationSeconds: 0,
+    };
+  }
+}
+
+export function addPlanningSeconds(seconds: number): void {
+  if (typeof window === 'undefined' || seconds <= 0) return;
+  try {
+    const current = getScreenTimeLedger();
+    current.planningDurationSeconds = (current.planningDurationSeconds || 0) + seconds;
+    localStorage.setItem(LEDGER_KEY, JSON.stringify(current));
+  } catch {}
+}
+
+export function startWalkTimer(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getScreenTimeLedger();
+    current.walkStartedAt = Date.now();
+    current.walkCompletedAt = null;
+    localStorage.setItem(LEDGER_KEY, JSON.stringify(current));
+  } catch {}
+}
+
+export function completeWalkTimer(walkSecondsOverride?: number): { plannedSec: number; walkSec: number; summary: string } {
+  if (typeof window === 'undefined') {
+    return { plannedSec: 160, walkSec: 5100, summary: 'Planned in 2m 40s. Outside for 1h 25m.' };
+  }
+  try {
+    const current = getScreenTimeLedger();
+    const plannedSec = current.planningDurationSeconds || 160;
+    let walkSec = walkSecondsOverride || 0;
+    if (!walkSec && current.walkStartedAt) {
+      walkSec = Math.floor((Date.now() - current.walkStartedAt) / 1000);
+    }
+    if (walkSec <= 0) walkSec = 60;
+
+    current.walkCompletedAt = Date.now();
+    current.walkDurationSeconds = walkSec;
+    const summary = formatLedgerSummary(plannedSec, walkSec);
+    current.lastSummary = summary;
+    localStorage.setItem(LEDGER_KEY, JSON.stringify(current));
+    return { plannedSec, walkSec, summary };
+  } catch {
+    return { plannedSec: 160, walkSec: 5100, summary: 'Planned in 2m 40s. Outside for 1h 25m.' };
+  }
+}
+
+export function formatLedgerSummary(plannedSec: number, walkSec: number): string {
+  const pMin = Math.floor(plannedSec / 60);
+  const pSec = plannedSec % 60;
+  const plannedStr = pMin > 0 ? `${pMin}m ${pSec}s` : `${pSec}s`;
+
+  const wHours = Math.floor(walkSec / 3600);
+  const wMin = Math.floor((walkSec % 3600) / 60);
+  const walkStr = wHours > 0 ? `${wHours}h ${wMin}m` : `${wMin}m`;
+
+  return `Planned in ${plannedStr}. Outside for ${walkStr}.`;
+}

@@ -101,6 +101,10 @@ export async function POST(req: NextRequest) {
         state: geocoded.state,
         country: geocoded.country,
       },
+      aiMetadata: {
+        source: aiResult.source,
+        modelUsed: aiResult.modelUsed,
+      },
     };
 
     // Assemble condensed TrailCardData
@@ -133,6 +137,10 @@ export async function POST(req: NextRequest) {
         day: 'numeric',
         year: 'numeric',
       }),
+      aiMetadata: {
+        source: aiResult.source,
+        modelUsed: aiResult.modelUsed,
+      },
     };
 
     return NextResponse.json({

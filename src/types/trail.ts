@@ -70,10 +70,14 @@ export interface TrailPlan {
   observations: ObservationPromptItem[];
   outdoorChallenges: string[];
   trailBriefing: string;
-  fieldPrompt: string;
+  fieldPrompt?: string;
   createdAt: string;
   deviceLocation?: DeviceLocation | null;
   trailLocation?: TrailLocation;
+  aiMetadata?: {
+    source?: 'ai' | 'fallback' | 'gemma2' | 'naturalist-fallback';
+    modelUsed?: string;
+  };
 }
 
 export interface TrailPreferences {
@@ -112,6 +116,10 @@ export interface TrailCardData {
   terrainNotes: string;
   safetyNote: string;
   generatedDate: string;
+  aiMetadata?: {
+    source?: 'ai' | 'fallback' | 'gemma2' | 'naturalist-fallback';
+    modelUsed?: string;
+  };
 }
 
 export interface FieldJournalEntry {

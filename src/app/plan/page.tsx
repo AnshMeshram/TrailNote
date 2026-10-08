@@ -6,7 +6,7 @@ import { Compass, Clock, MapPin, Feather, Check, ArrowRight, Sparkles, AlertCirc
 import { LeafDecoration } from '@/components/ui/LeafDecoration';
 import { DifficultyBadge } from '@/components/ui/DifficultyBadge';
 import { DifficultyLevel, FitnessLevel, WeatherTolerance, TrailPreferences, DeviceLocation, TrailLocation } from '@/types/trail';
-import { saveActiveTrail, saveDeviceLocation, getDeviceLocation } from '@/lib/storage/offline-store';
+import { saveActiveTrail, saveDeviceLocation, getDeviceLocation, addPlanningSeconds } from '@/lib/storage/offline-store';
 import { getCurrentLocation } from '@/lib/location/geolocation';
 import { TrailnoteNormalizedLocation } from '@/lib/maps/nominatim';
 
@@ -53,6 +53,32 @@ export default function PlanPage() {
   const [accessibility, setAccessibility] = useState<string[]>(['Natural uneven footpath']);
   const [personalNotes, setPersonalNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Track active visible planning time via Page Visibility API
+  useEffect(() => {
+    let lastActive = Date.now();
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        const deltaSec = Math.floor((Date.now() - lastActive) / 1000);
+        if (deltaSec > 0 && deltaSec < 30) {
+          addPlanningSeconds(deltaSec);
+        }
+        lastActive = Date.now();
+      }
+    }, 3000);
+
+    const onVisChange = () => {
+      if (document.visibilityState === 'visible') {
+        lastActive = Date.now();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisChange);
+    };
+  }, []);
 
   // Load existing device location if cached
   useEffect(() => {
