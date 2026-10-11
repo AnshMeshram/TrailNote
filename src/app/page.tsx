@@ -78,6 +78,17 @@ export default function HomePage() {
                 <a href="#how-it-works" className="btn-secondary" style={{ padding: '0.95rem 1.6rem' }}>
                   <span>How It Works</span>
                 </a>
+
+                <a
+                  href="https://github.com/AnshMeshram/TrailNote"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary"
+                  style={{ padding: '0.95rem 1.4rem' }}
+                  title="View open-source repository on GitHub"
+                >
+                  <span>GitHub ↗</span>
+                </a>
               </div>
 
               {/* Single Line of Honest Metadata */}

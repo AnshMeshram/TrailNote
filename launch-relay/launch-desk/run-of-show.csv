@@ -1,0 +1,7 @@
+Time,Owner,Action,Status
+T-60m,Source Editor,Verify live Netlify build and public GitHub repository links,Complete
+T-45m,Launch Producer,Ingest approved source brief from shared launch desk,Complete
+T-30m,Launch Producer,Draft developer announcement text without hype language,Complete
+T-15m,Source Editor,Execute quality assurance audit against source brief,In Progress
+T-00m,Launch Producer,Finalize release package in shared launch desk workspace,Ready
+T+15m,Community Lead,Archive launch run-of-show and QA documentation locally,Scheduled

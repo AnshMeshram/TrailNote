@@ -77,6 +77,17 @@ export function Footer() {
                   → Real Field Test Protocol
                 </Link>
               </li>
+              <li>
+                <a
+                  href="https://github.com/AnshMeshram/TrailNote"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: '0.9rem', color: 'var(--green-leaf)', fontWeight: 600 }}
+                  className="hover-underline"
+                >
+                  → GitHub Repository (Open Source) ↗
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -139,7 +150,19 @@ export function Footer() {
             color: 'var(--ink-muted)',
           }}
         >
-          <div>TRAILNOTE · LOCAL-FIRST OUTDOOR FIELD NOTEBOOK</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+            <span>TRAILNOTE · LOCAL-FIRST OUTDOOR FIELD NOTEBOOK</span>
+            <span>·</span>
+            <a
+              href="https://github.com/AnshMeshram/TrailNote"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--green-leaf)', textDecoration: 'none', fontWeight: 600 }}
+              className="hover-underline"
+            >
+              GITHUB: AnshMeshram/TrailNote ↗
+            </a>
+          </div>
           <div>REMEMBER: THE SCREEN IS THE SHORTEST PART OF THE WALK.</div>
         </div>
       </div>

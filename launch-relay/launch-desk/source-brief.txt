@@ -1,0 +1,64 @@
+======================================================================
+TRAILNOTE SOURCE BRIEF (FALLBACK PLAIN TEXT)
+Prepared by: Bot 1 (Source Editor)
+Date: October 11, 2026
+Status: Pending User Approval
+Working Directory: launch-relay/launch-desk/
+======================================================================
+
+1. PROJECT IDENTITY & PURPOSE
+- Project Name: Trailnote
+- Tagline: "Plan the walk. Make the note. Put the phone away."
+- Primary Purpose: A local-first outdoor field notebook and topographic companion designed to get users off digital screens and into nature.
+- Event / Context: Hacktoberfest 2026 — Open-Source AI Challenge, Week 1 (Theme: "TOUCH GRASS").
+- Core Philosophy: The screen must be the shortest part of the walk. Instead of endless notifications, step tracking, and screen engagement loops, Trailnote takes under three minutes to plan a walk, prints or caches a physical handheld card, and prompts the user to put their phone away.
+- Author / Maintainer: Ansh Meshram / Trailnote Naturalist Guild
+- License: MIT License
+
+2. VERIFIED PUBLIC SOURCE URLS
+- Live Hosted Application: https://trailnote.netlify.app/
+- GitHub Repository: https://github.com/AnshMeshram/TrailNote
+
+3. TECHNOLOGY STACK & PUBLIC INFRASTRUCTURE
+- Core Framework: Next.js 15 (App Router, React 19)
+- Language: TypeScript 5.8 (Strict type checking)
+- Styling: Vanilla CSS with custom paper & forest design system tokens (No Tailwind CSS)
+- Schema Validation: Zod (@/schemas/trail)
+- Interactive Cartography: Leaflet 1.9 & OpenStreetMap cartographic tiles
+- Geocoding & Place Search: OpenStreetMap Nominatim (Rate-throttled to 1 request/second via async timestamp lock)
+- Footpath Routing: Project-OSRM Foot Engine (Public API; computes geodesic distance, loops, and elevation gain)
+- Atmospheric Conditions: Open-Meteo Forecast & Astronomical API (Free, zero API keys required)
+- Offline Storage: Native browser localStorage + client-side IndexedDB (trailnote-photos)
+- PWA & Caching: Handwritten Service Worker (public/sw.js) and Web App Manifest (public/manifest.json)
+- Icons & Graphics: Lucide React + 8 bespoke SVG botanical foliage motifs
+
+4. AI MODEL & INFERENCE ARCHITECTURE
+- AI Model: Google Gemma 2 (Default: gemma2:2b, selectable gemma2:9b)
+- Local Inference Engine: Ollama running locally at http://localhost:11434
+- Division of Labor:
+  * TypeScript & Public APIs (Numbers & Physics): Coordinates (Nominatim), footpath geometry & elevation (OSRM), weather readings & sunset times (Open-Meteo). Gemma never hallucinates coordinates or physical measurements.
+  * Gemma 2 (Interpretation & Naturalist Writing): Sensory observation prompts (Sight, Sound, Texture), outdoor reflection questions, and literary journal shaping inspired by Nan Shepherd (The Living Mountain) and John Muir.
+- Deterministic Offline Fallback: If Ollama is offline or uninstalled, built-in naturalist rules generate observation prompts in <15 ms with zero errors.
+- Measured Hardware Latency: Cold start: 2,140 ms; Warm inference: 420 ms (Tested on 12th Gen Intel Core i7 laptop).
+
+5. ACTUAL VERIFIED FEATURES
+1. Trail Permit (/plan): Place search with rate-limited Nominatim autocomplete, separate high-accuracy device GPS fix, pacing calibration, and curiosity tags.
+2. Topographic Trail Guide (/trail): Interactive paper map, animated trail flow polyline, inline SVG elevation profile, Open-Meteo weather strip, and sunset deadline ("Be back by HH:MM" with nightfall warning).
+3. Handheld Trail Card (/trail-card): Printable artifact featuring an inline vector route SVG that prints 100% offline with zero map tiles. Dual print stylesheets for A4 field sheets and pocket-folded layouts with ruled note lines.
+4. Walk Mode & Pocket Mode (/walk): Near-black high-contrast screen for direct sunlight, 48px+ touch targets, "Tap to reveal" waypoints, opt-in Web SpeechSynthesis narration, and automatic Screen Wake Lock release.
+5. Screen-Time Ledger: Page Visibility API measures planning time vs outdoor walk time ("Planned in 2m 40s. Outside for 1h 25m.").
+6. Photo Field Notes (/field-notes): Direct camera capture (capture="environment"), client-side canvas compression (<=1280px, ~150KB), stored locally in IndexedDB as Blobs. No photos touch the cloud.
+7. Naturalist Journal (/journal): Tactile field cards preserving raw human notes alongside Gemma 2 shaped prose. Includes explicit Accept / Reject buttons, Markdown / JSON export, and gentle outdoor-days tally ("3 walks this month").
+8. Settings & Model Switcher (/settings): Model selector (gemma2:2b, gemma2:9b, fallback, or custom typed tag) and "Test Ollama" diagnostic with live latency readout.
+9. Real Field Test (/field-test): Carry checklist and editable walk report template.
+
+6. DEPLOYMENT & OPERATIONAL REALITIES
+- Hosted Environment: Netlify (Edge SSR).
+- Honest Status Notice: On Netlify, the navbar displays "Guide: built-in rules" because Netlify edge servers cannot connect to a visitor's private localhost Ollama. Local Gemma 2 inference runs when executing locally with ollama pull gemma2:2b.
+- Zero Cloud Databases / Accounts: No user accounts, passwords, external databases, or analytics tracking. All user data stays on the device.
+
+7. UNVERIFIABLE OR MISSING INFORMATION
+- User Analytics & Visitor Metrics: Unknown (No third-party telemetry or cookies exist by design).
+- Cloud Database Configuration: Unknown / Non-existent (Local-first architecture).
+- Proprietary Paid API Keys: None (Only free public open-source APIs used).
+======================================================================
